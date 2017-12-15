@@ -1,0 +1,10 @@
+[package]
+name = "rcc"
+version = "0.1.0"
+authors = ["Hugo Laloge <hugo.laloge@gmail.com>"]
+description = "Rust C compiler, done to learn rust and compilers"
+license = "MIT"
+
+[dependencies]
+clap = "^2.29"
+nom = "^3.2"
