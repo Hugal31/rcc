@@ -6,7 +6,7 @@ use std::io::prelude::*;
 mod c;
 mod parser;
 
-use c::ToAsm;
+use c::Compile;
 
 type Result<T> = std::result::Result<T, &'static str>;
 
@@ -26,7 +26,7 @@ fn compile<I, O>(input: &mut I, output: &mut O) -> Result<()> where I:Read, O: W
     input.read_to_string(&mut data).unwrap();
 
     let function = parser::parse(&data).map_err(|_| "Error while parsing")?;
-    function.to_asm(output).unwrap();
+    function.compile(output).unwrap();
 
     Ok(())
 }

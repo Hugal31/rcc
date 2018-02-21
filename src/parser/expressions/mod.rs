@@ -8,9 +8,13 @@ pub fn parse_expression(input: &str) -> IResult<&str, i32> {
 
 named!(pub parse_i32<&str, i32>, map_res!(digit, i32::from_str));
 
-#[test]
-fn test_parse_i32() {
+#[cfg(test)]
+mod test {
+    use super::*;
     use nom::IResult::Done;
 
-    assert_eq!(parse_i32("42"), Done("", 42));
+    #[test]
+    fn test_parse_i32() {
+        assert_eq!(parse_i32("42"), Done("", 42));
+    }
 }

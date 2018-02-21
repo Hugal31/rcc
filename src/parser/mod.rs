@@ -1,13 +1,12 @@
 mod expressions;
 mod identifier;
-mod instructions;
 mod statements;
 mod types;
 
 pub use self::identifier::parse_identifier;
 
 use c::Function;
-use self::instructions::parse_return;
+use self::statements::parse_statement;
 use self::types::parse_type;
 
 type Result<T> = ::std::result::Result<T, ()>;
@@ -19,7 +18,7 @@ named!(parse_function<&str, Function>,
             name: parse_identifier >>
             char!('(') >> char!(')') >>
             char!('{') >>
-            statements: many0!(parse_return) >>
+            statements: many0!(parse_statement) >>
             char!('}') >>
             (Function{name: name.to_owned(), statements: statements})
         )
@@ -32,16 +31,23 @@ pub fn parse<'a>(input: &'a str) -> Result<Function> {
     r.to_result().map_err(|_| ())
 }
 
-#[test]
-fn parse_simple_function() {
+#[cfg(test)]
+mod test {
+    use super::*;
     use nom::IResult::Done;
-    use c::instructions::unary::Return;
+    use c::Statement;
 
-    let function = "int main() {\
+    #[test]
+    fn parse_simple_function() {
+
+        let function = "int main() {\
     return 42;\
     }";
-    assert_eq!(parse_function(function),
-               Done("",
-                    Function{name: "main".to_owned(),
-                        statements: vec![Return{expression: 42}]}));
+        assert_eq!(parse_function(function),
+                   Done("",
+                        Function {
+                            name: "main".to_owned(),
+                            statements: vec![Statement::Return(42)]
+                        }));
+    }
 }

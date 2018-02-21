@@ -19,11 +19,16 @@ pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
     Done(&input[input_length..], &input[0..input_length])
 }
 
-#[test]
-fn test_parse_identifier() {
-    assert_eq!(parse_identifier("abcdef1234"), Done("", "abcdef1234"));
-    assert_eq!(parse_identifier("_abcdef1234"), Done("", "_abcdef1234"));
-    assert_eq!(parse_identifier("_abcdef1234 "), Done(" ", "_abcdef1234"));
-    assert_eq!(parse_identifier("1abc"), Error(ErrorKind::Custom(0)));
-    assert_eq!(parse_identifier(""), Incomplete(Needed::Unknown));
+#[cfg(test)]
+mod test{
+    use super::*;
+
+    # [test]
+    fn test_parse_identifier() {
+        assert_eq!(parse_identifier("abcdef1234"), Done("", "abcdef1234"));
+        assert_eq!(parse_identifier("_abcdef1234"), Done("", "_abcdef1234"));
+        assert_eq!(parse_identifier("_abcdef1234 "), Done(" ", "_abcdef1234"));
+        assert_eq!(parse_identifier("1abc"), Error(ErrorKind::Custom(0)));
+        assert_eq!(parse_identifier(""), Incomplete(Needed::Unknown));
+    }
 }
