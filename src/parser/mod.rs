@@ -1,21 +1,16 @@
 mod expressions;
 mod identifier;
 mod instructions;
+mod statements;
 mod types;
 
 pub use self::identifier::parse_identifier;
 
-use c::instructions::unary::Return;
+use c::Function;
 use self::instructions::parse_return;
 use self::types::parse_type;
 
 type Result<T> = ::std::result::Result<T, ()>;
-
-#[derive(Debug, PartialEq)]
-pub struct Function {
-    pub name: String,
-    pub instructions: Vec<Return>,
-}
 
 named!(parse_function<&str, Function>,
     ws!(
@@ -24,9 +19,9 @@ named!(parse_function<&str, Function>,
             name: parse_identifier >>
             char!('(') >> char!(')') >>
             char!('{') >>
-            inst: parse_return >>
+            statements: many0!(parse_return) >>
             char!('}') >>
-            (Function{name: name.to_owned(), instructions: vec![inst]})
+            (Function{name: name.to_owned(), statements: statements})
         )
     )
 );
@@ -40,6 +35,7 @@ pub fn parse<'a>(input: &'a str) -> Result<Function> {
 #[test]
 fn parse_simple_function() {
     use nom::IResult::Done;
+    use c::instructions::unary::Return;
 
     let function = "int main() {\
     return 42;\
@@ -47,5 +43,5 @@ fn parse_simple_function() {
     assert_eq!(parse_function(function),
                Done("",
                     Function{name: "main".to_owned(),
-                        instructions: vec![Return{expression: 42}]}));
+                        statements: vec![Return{expression: 42}]}));
 }

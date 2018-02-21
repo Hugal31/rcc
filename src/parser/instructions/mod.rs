@@ -1,13 +1,13 @@
-use c::instructions::unary::Return;
-use super::expressions::parse_i32;
+use c::instructions::Return;
+use super::expressions::parse_expression;
 
 named!(pub parse_return<&str, Return>,
     ws!(
         do_parse!(
             tag!("return") >>
-            int: parse_i32 >>
+            expr: parse_expression >>
             char!(';') >>
-            (Return{expression: int})
+            (Return{expression: expr})
         )
     )
 );
