@@ -1,9 +1,9 @@
 mod expressions;
+mod identifier;
 mod instructions;
 mod types;
 
-use nom::{alphanumeric, digit};
-use nom::IResult::Done;
+pub use self::identifier::parse_identifier;
 
 use c::instructions::unary::Return;
 use self::instructions::parse_return;
@@ -21,7 +21,7 @@ named!(parse_function<&str, Function>,
     ws!(
         do_parse!(
             parse_type >>
-            name: alphanumeric >>
+            name: parse_identifier >>
             char!('(') >> char!(')') >>
             char!('{') >>
             inst: parse_return >>
@@ -39,6 +39,8 @@ pub fn parse<'a>(input: &'a str) -> Result<Function> {
 
 #[test]
 fn parse_simple_function() {
+    use nom::IResult::Done;
+
     let function = "int main() {\
     return 42;\
     }";

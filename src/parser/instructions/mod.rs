@@ -1,5 +1,3 @@
-use nom::IResult::Done;
-
 use c::instructions::unary::Return;
 use super::expressions::parse_i32;
 
@@ -16,5 +14,7 @@ named!(pub parse_return<&str, Return>,
 
 #[test]
 fn test_parse_return() {
+    use nom::IResult::Done;
+
     assert_eq!(parse_return("return 42;"), Done("", Return{expression: 42}));
 }

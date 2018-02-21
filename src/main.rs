@@ -14,10 +14,11 @@ fn main() {
              .index(1))
         .arg(Arg::with_name("OUTPUT")
              .help("Output file")
-             .default_value("out.s")
+             .default_value("-")
              .index(2))
         .get_matches();
 
     let input_file = matches.value_of("INPUT").unwrap();
-    rcc::compile_file(input_file, matches.value_of("OUTPUT").unwrap());
+    let output_file = matches.value_of("OUTPUT").unwrap();
+    rcc::compile_file(input_file, output_file).unwrap();
 }
