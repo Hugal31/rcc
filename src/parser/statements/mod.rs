@@ -11,3 +11,15 @@ named!(pub parse_statement<&str, Statement>,
         (inst)
     ))
 );
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use nom::IResult::Done;
+    use c::Expression;
+
+    #[test]
+    fn test_parse_statement() {
+        assert_eq!(parse_statement("return 42;"), Done("", Statement::Return(Expression::Literal(42))));
+    }
+}

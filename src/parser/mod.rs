@@ -9,8 +9,6 @@ use c::Function;
 use self::statements::parse_statement;
 use self::types::parse_type;
 
-type Result<T> = ::std::result::Result<T, ()>;
-
 named!(parse_function<&str, Function>,
     ws!(
         do_parse!(
@@ -25,17 +23,17 @@ named!(parse_function<&str, Function>,
     )
 );
 
-pub fn parse<'a>(input: &'a str) -> Result<Function> {
+pub fn parse<'a>(input: &'a str) -> Function {
     let r = parse_function(input);
 
-    r.to_result().map_err(|_| ())
+    r.to_result().expect("Parsing error")
 }
 
 #[cfg(test)]
 mod test {
     use super::*;
     use nom::IResult::Done;
-    use c::Statement;
+    use c::{Expression, Statement};
 
     #[test]
     fn parse_simple_function() {
@@ -47,7 +45,7 @@ mod test {
                    Done("",
                         Function {
                             name: "main".to_owned(),
-                            statements: vec![Statement::Return(42)]
+                            statements: vec![Statement::Return(Expression::Literal(42))]
                         }));
     }
 }

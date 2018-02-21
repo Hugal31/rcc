@@ -25,7 +25,7 @@ fn compile<I, O>(input: &mut I, output: &mut O) -> Result<()> where I:Read, O: W
     let mut data = String::new();
     input.read_to_string(&mut data).unwrap();
 
-    let function = parser::parse(&data).map_err(|_| "Error while parsing")?;
+    let function = parser::parse(&data);
     function.compile(output).unwrap();
 
     Ok(())
