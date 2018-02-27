@@ -55,30 +55,35 @@ named!(parse_int_literal<&str, Expression>, map!(map_res!(digit, i32::from_str),
 mod test {
     use super::*;
     use nom::IResult::Done;
+    use c::Expression::*;
 
     #[test]
-    fn test_parse_expression() {
-        assert_eq!(parse_expression("42"), Done("", Expression::Literal(42)));
+    fn test_parse_simple_expression() {
+        assert_eq!(parse_expression("42"), Done("", Literal(42)));
+    }
+
+    #[test]
+    fn test_parse_unary_operator() {
         assert_eq!(parse_expression("!42"),
                    Done("",
-                        Expression::Unary(UnaryOperator::LocalNegation,
-                                          Box::from(Expression::Literal(42)))));
+                        Unary(UnaryOperator::LocalNegation,
+                                          Box::new(Literal(42)))));
         assert_eq!(parse_expression("!!42"),
                    Done("",
-                        Expression::Unary(UnaryOperator::LocalNegation,
-                                          Box::from(Expression::Unary(UnaryOperator::LocalNegation,Box::from(Expression::Literal(42)))))));
+                        Unary(UnaryOperator::LocalNegation,
+                                          Box::new(Unary(UnaryOperator::LocalNegation,Box::new(Literal(42)))))));
         assert_eq!(parse_expression("~42"),
                    Done("",
-                        Expression::Unary(UnaryOperator::Bitwise,
-                                     Box::from(Expression::Literal(42)))));
+                        Unary(UnaryOperator::Bitwise,
+                                     Box::new(Literal(42)))));
         assert_eq!(parse_expression("-42"),
                    Done("",
-                        Expression::Unary(UnaryOperator::Negation,
-                                          Box::from(Expression::Literal(42)))));
+                        Unary(UnaryOperator::Negation,
+                                          Box::new(Literal(42)))));
     }
 
     #[test]
     fn test_parse_int_literal() {
-        assert_eq!(parse_int_literal("42"), Done("", Expression::Literal(42)));
+        assert_eq!(parse_int_literal("42"), Done("", Literal(42)));
     }
 }
