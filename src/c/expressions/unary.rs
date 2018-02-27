@@ -25,3 +25,24 @@ impl Compile for UnaryOperator {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use c::test::test_compile;
+
+    #[test]
+    fn test_compile_bitwise() {
+        test_compile(UnaryOperator::Bitwise, "not %eax\n");
+    }
+
+    #[test]
+    fn test_compile_negation() {
+        test_compile(UnaryOperator::Negation, "neg %eax\n");
+    }
+
+    #[test]
+    fn test_compile_local_negation() {
+        test_compile(UnaryOperator::LocalNegation, "cmpl $0, %eax\nmovl $0, %eax\nsete %al\n");
+    }
+}

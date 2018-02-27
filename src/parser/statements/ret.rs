@@ -14,11 +14,11 @@ named!(pub parse_return<&str, Statement>,
 #[cfg(test)]
 mod test {
     use super::*;
-    use c::Expression;
     use nom::IResult::Done;
+    use c::{Expression, Term, Factor, Statement};
 
     #[test]
     fn test_parse_return() {
-        assert_eq!(parse_return("return 42"), Done("", Statement::Return(Expression::Literal(42))));
+        assert_eq!(parse_return("return 42"), Done("", Statement::Return(Expression::new(Term::new(Factor::Literal(42))))));
     }
 }
