@@ -3,8 +3,9 @@
 use std::fs::File;
 use std::io::prelude::*;
 
-mod c;
-mod parser;
+pub mod c;
+pub mod parser;
+mod writers;
 
 use c::Compile;
 
