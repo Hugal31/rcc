@@ -10,10 +10,10 @@ pub enum Statement {
 
 impl Compile for Statement {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
-        match self {
-            &Statement::Return(ref e) => {
+        match *self {
+            Statement::Return(ref e) => {
                 e.compile(output)?;
-                output.write("ret\n".as_bytes())?;
+                output.write_all(b"ret\n")?;
             },
         }
 

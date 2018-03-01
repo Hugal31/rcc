@@ -1,4 +1,4 @@
-
+use std::str::FromStr;
 use c::{Factor, Term};
 use c::expressions::binary::TermOperation;
 use super::factor::parse_factor;
@@ -8,29 +8,17 @@ named!(pub parse_term<&str, Term>,
         factor: parse_factor >>
         operations: many0!(parse_term_operation) >>
         (Term{
-            factor: factor,
-            operations: operations,
+            factor,
+            operations,
         })
     )
 );
 
-named!(parse_term_operation<&str, ((TermOperation, Factor))>,
-    alt!(parse_mul_operation | parse_div_operation)
-);
-
-named!(parse_mul_operation<&str, (TermOperation, Factor)>,
+named!(parse_term_operation<&str, (TermOperation, Factor)>,
     ws!(do_parse!(
-        char!('*') >>
+        operator: map_res!(alt!(tag!("*") | tag!("/")), TermOperation::from_str) >>
         expr: parse_factor >>
-        ((TermOperation::Multiplication, expr))
-    ))
-);
-
-named!(parse_div_operation<&str, (TermOperation, Factor)>,
-    ws!(do_parse!(
-        char!('/') >>
-        expr: parse_factor >>
-        ((TermOperation::Division, expr))
+        (operator, expr)
     ))
 );
 

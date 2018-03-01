@@ -11,8 +11,8 @@ pub struct Function {
 
 impl Compile for Function {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
-        output.write(format!(".globl {}\n", self.name).as_bytes())?;
-        output.write(format!("{}:\n", self.name).as_bytes())?;
+        output.write_fmt(format_args!(".globl {}\n", self.name))?;
+        output.write_fmt(format_args!("{}:\n", self.name))?;
 
         for stmt in &self.statements {
             stmt.compile(output)?;

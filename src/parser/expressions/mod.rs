@@ -1,6 +1,7 @@
 mod factor;
 mod term;
 
+use std::str::FromStr;
 use c::{Expression, Term};
 use c::expressions::binary::ExpressionOperation;
 use self::term::parse_term;
@@ -10,29 +11,17 @@ named!(pub parse_expression<&str, Expression>,
         term: parse_term >>
         operations: many0!(parse_expr_operation) >>
         (Expression{
-            term: term,
-            operations: operations,
+            term,
+            operations,
         })
     )
 );
 
 named!(parse_expr_operation<&str, ((ExpressionOperation, Term))>,
-    alt!(parse_plus_operation | parse_minus_operation)
-);
-
-named!(parse_plus_operation<&str, (ExpressionOperation, Term)>,
     ws!(do_parse!(
-        char!('+') >>
+        operator: map_res!(alt!(tag!("+") | tag!("-")), ExpressionOperation::from_str) >>
         expr: parse_term >>
-        ((ExpressionOperation::Addition, expr))
-    ))
-);
-
-named!(parse_minus_operation<&str, (ExpressionOperation, Term)>,
-    ws!(do_parse!(
-        char!('-') >>
-        expr: parse_term >>
-        ((ExpressionOperation::Subtraction, expr))
+        (operator, expr)
     ))
 );
 

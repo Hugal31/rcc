@@ -18,12 +18,12 @@ named!(parse_function<&str, Function>,
             char!('{') >>
             statements: many0!(parse_statement) >>
             char!('}') >>
-            (Function{name: name.to_owned(), statements: statements})
+            (Function{name: name.to_owned(), statements})
         )
     )
 );
 
-pub fn parse<'a>(input: &'a str) -> Function {
+pub fn parse(input: &str) -> Function {
     let r = parse_function(input);
 
     r.to_result().expect("Parsing error")

@@ -12,15 +12,15 @@ pub enum Factor {
 
 impl Compile for Factor {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
-        match self {
-            &Factor::Literal(i) => {
-                output.write(format!("movl ${}, %eax\n", i).as_bytes())?;
+        match *self {
+            Factor::Literal(i) => {
+                output.write_all(format!("movl ${}, %eax\n", i).as_bytes())?;
             },
-            &Factor::Unary(op, ref exp) => {
+            Factor::Unary(op, ref exp) => {
                 exp.compile(output)?;
                 op.compile(output)?;
             },
-            &Factor::Expr(ref expr) => {
+            Factor::Expr(ref expr) => {
                 expr.compile(output)?;
             },
         }

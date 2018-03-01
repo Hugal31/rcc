@@ -10,6 +10,7 @@ pub struct Expression {
 }
 
 impl Expression {
+    #[allow(dead_code)]
     pub fn new(term: Term) -> Expression {
         Expression{
             term,
@@ -22,16 +23,16 @@ impl Compile for Expression {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
         self.term.compile(output)?;
         for operation in &self.operations {
-            output.write(b"push %eax\n")?;
+            output.write_all(b"push %eax\n")?;
             operation.1.compile(output)?;
-            output.write(b"pop %ecx\n")?;
+            output.write_all(b"pop %ecx\n")?;
             match operation.0 {
                 ExpressionOperation::Addition => {
-                    output.write(b"addl %ecx, %eax\n")?;
+                    output.write_all(b"addl %ecx, %eax\n")?;
                 }
                 ExpressionOperation::Subtraction => {
-                    output.write(b"xchg %ecx, %eax\n")?;
-                    output.write(b"subl %ecx, %eax\n")?;
+                    output.write_all(b"xchg %ecx, %eax\n")?;
+                    output.write_all(b"subl %ecx, %eax\n")?;
                 }
             }
         }

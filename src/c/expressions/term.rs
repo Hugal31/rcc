@@ -10,6 +10,7 @@ pub struct Term {
 }
 
 impl Term {
+    #[allow(dead_code)]
     pub fn new(factor: Factor) -> Term {
         Term{
             factor,
@@ -22,15 +23,15 @@ impl Compile for Term {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
         self.factor.compile(output)?;
         for operation in &self.operations {
-            output.write(b"push %eax\n")?;
+            output.write_all(b"push %eax\n")?;
             operation.1.compile(output)?;
-            output.write(b"pop %ecx\n")?;
+            output.write_all(b"pop %ecx\n")?;
             match operation.0 {
                 TermOperation::Multiplication => {
-                    output.write(b"imul %ecx, %eax\n")?;
+                    output.write_all(b"imul %ecx, %eax\n")?;
                 },
                 TermOperation::Division => {
-                    output.write(br#"xchg %ecx, %eax
+                    output.write_all(br#"xchg %ecx, %eax
 xor %edx, %edx
 divl %ecx
 "#)?;
