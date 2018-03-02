@@ -8,16 +8,16 @@ pub struct IndentWriter<'a, W: 'a>
 impl<'a, W> IndentWriter<'a, W>
     where W: Write {
     pub fn new(inner: &'a mut W) -> IndentWriter<'a, W> {
-        return IndentWriter{
+        IndentWriter{
             inner
         }
     }
 }
 
+/// TODO Use other thing than writer
 impl<'a, W> Write for IndentWriter<'a, W>
     where W: Write {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        let mut inserted_indent = 1;
         let mut tmp_buf = buf.to_vec();
         tmp_buf.insert(0, b'\t');
 
@@ -28,10 +28,9 @@ impl<'a, W> Write for IndentWriter<'a, W>
                 break;
             }
             tmp_buf.insert(offset, b'\t');
-            inserted_indent += 1;
         }
 
-        self.inner.write(&mut tmp_buf).map(|size| size - inserted_indent)
+        self.inner.write_all(&tmp_buf).map(|_| buf.len())
     }
 
     fn flush(&mut self) -> Result<()> {
