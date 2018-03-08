@@ -66,7 +66,7 @@ named!(parse_int_literal<&str, Factor>, map!(map_res!(digit, i32::from_str), Fac
 mod test {
     use super::*;
     use nom::IResult::Done;
-    use c::{Expression, Term};
+    use c::{AdditiveExpression, Term};
     use c::Factor::*;
 
     #[test]
@@ -103,7 +103,7 @@ mod test {
     fn test_parse_expression_in_parenthesis() {
         let factor = parse_factor("(42)");
         assert_eq!(factor, Done("",
-                                Expr(Box::new(Expression::new(Term::new(Literal(42)))))));
+                                Expr(Box::new(AdditiveExpression::new(Term::new(Literal(42)))))));
 
         let factor_with_space = parse_factor("( 42 )");
         assert_eq!(factor, factor_with_space);

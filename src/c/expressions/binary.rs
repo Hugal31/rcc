@@ -2,7 +2,7 @@ use std::fmt;
 use std::str::FromStr;
 
 #[derive(Clone,Copy,Debug,PartialEq)]
-pub enum ExpressionOperation {
+pub enum AdditiveOperator {
     Addition,
     Subtraction,
 }
@@ -16,13 +16,13 @@ impl fmt::Display for ParseExpressionOperationError {
     }
 }
 
-impl FromStr for ExpressionOperation {
+impl FromStr for AdditiveOperator {
     type Err = ParseExpressionOperationError;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
-            "+" => Ok(ExpressionOperation::Addition),
-            "-" => Ok(ExpressionOperation::Subtraction),
+            "+" => Ok(AdditiveOperator::Addition),
+            "-" => Ok(AdditiveOperator::Subtraction),
             _ => Err(ParseExpressionOperationError{}),
         }
     }
@@ -62,9 +62,9 @@ mod test {
 
     #[test]
     fn test_parse_expression_operation() {
-        assert_eq!("+".parse(), Ok(ExpressionOperation::Addition));
-        assert_eq!("-".parse(), Ok(ExpressionOperation::Subtraction));
-        assert_eq!("nop".parse::<ExpressionOperation>(), Err(ParseExpressionOperationError{}));
+        assert_eq!("+".parse(), Ok(AdditiveOperator::Addition));
+        assert_eq!("-".parse(), Ok(AdditiveOperator::Subtraction));
+        assert_eq!("nop".parse::<AdditiveOperator>(), Err(ParseExpressionOperationError{}));
     }
 
     #[test]

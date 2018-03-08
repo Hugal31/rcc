@@ -1,25 +1,26 @@
 use std::io::{Result, Write};
+
 use c::Compile;
 use super::Term;
-use super::binary::ExpressionOperation;
+use super::binary::AdditiveOperator;
 
 #[derive(Debug,PartialEq)]
-pub struct Expression {
+pub struct AdditiveExpression {
     pub term: Term,
-    pub operations: Vec<(ExpressionOperation, Term)>,
+    pub operations: Vec<(AdditiveOperator, Term)>,
 }
 
-impl Expression {
+impl AdditiveExpression {
     #[allow(dead_code)]
-    pub fn new(term: Term) -> Expression {
-        Expression{
+    pub fn new(term: Term) -> AdditiveExpression {
+        AdditiveExpression {
             term,
             operations: vec!(),
         }
     }
 }
 
-impl Compile for Expression {
+impl Compile for AdditiveExpression {
     fn compile<O>(&self, output: &mut O) -> Result<()> where O: Write {
         self.term.compile(output)?;
         for operation in &self.operations {
@@ -27,10 +28,10 @@ impl Compile for Expression {
             operation.1.compile(output)?;
             output.write_all(b"pop %ecx\n")?;
             match operation.0 {
-                ExpressionOperation::Addition => {
+                AdditiveOperator::Addition => {
                     output.write_all(b"addl %ecx, %eax\n")?;
                 }
-                ExpressionOperation::Subtraction => {
+                AdditiveOperator::Subtraction => {
                     output.write_all(b"xchg %ecx, %eax\n")?;
                     output.write_all(b"subl %ecx, %eax\n")?;
                 }
@@ -49,9 +50,9 @@ mod test {
 
     #[test]
     fn test_compile_addition() {
-        test_compile(Expression{
+        test_compile(AdditiveExpression {
             term: Term::new(Factor::Literal(42)),
-            operations: vec![(ExpressionOperation::Addition, Term::new(Factor::Literal(32)))]
+            operations: vec![(AdditiveOperator::Addition, Term::new(Factor::Literal(32)))]
         }, r#"movl $42, %eax
 push %eax
 movl $32, %eax
@@ -62,9 +63,9 @@ addl %ecx, %eax
 
     #[test]
     fn test_compile_subtraction() {
-        test_compile(Expression{
+        test_compile(AdditiveExpression {
             term: Term::new(Factor::Literal(42)),
-            operations: vec![(ExpressionOperation::Subtraction,
+            operations: vec![(AdditiveOperator::Subtraction,
                               Term::new(Factor::Literal(32)))]
         }, r#"movl $42, %eax
 push %eax

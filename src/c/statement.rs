@@ -1,11 +1,11 @@
 use std::io::{Result, Write};
 
 use super::Compile;
-use super::expressions::Expression;
+use super::expressions::AdditiveExpression;
 
 #[derive(Debug,PartialEq)]
 pub enum Statement {
-    Return(Expression)
+    Return(AdditiveExpression)
 }
 
 impl Compile for Statement {

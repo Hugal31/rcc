@@ -5,7 +5,7 @@ pub mod function;
 pub mod statement;
 pub mod types;
 
-pub use self::expressions::{Expression, Factor, Term};
+pub use self::expressions::{AdditiveExpression, Factor, Term};
 pub use self::function::*;
 pub use self::statement::Statement;
 
