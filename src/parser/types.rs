@@ -5,7 +5,7 @@ use c::types::Type;
 named!(pub parse_type<&str, Type>, map_res!(alt!(tag!("void") | tag!("int")), Type::from_str));
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
 

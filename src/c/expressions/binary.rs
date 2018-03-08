@@ -57,7 +57,7 @@ impl fmt::Display for ParseTermOperationError {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
 
     #[test]

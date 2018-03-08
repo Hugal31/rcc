@@ -14,7 +14,7 @@ pub trait Compile {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::Compile;
 
     pub fn test_compile<C>(expr: C, expected_output: &str) where C: Compile {

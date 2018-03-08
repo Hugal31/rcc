@@ -51,9 +51,9 @@ impl FromStr for UnaryOperator {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
-    use c::test::test_compile;
+    use c::tests::test_compile;
 
     #[test]
     fn test_compile_bitwise() {

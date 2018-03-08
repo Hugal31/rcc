@@ -12,7 +12,7 @@ named!(pub parse_return<&str, Statement>,
 );
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::{AdditiveExpression, Term, Factor, Statement};

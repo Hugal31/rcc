@@ -37,9 +37,9 @@ impl From<i32> for Factor {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
-    use c::test::test_compile;
+    use c::tests::test_compile;
 
     #[test]
     fn test_compile_literal() {

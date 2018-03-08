@@ -20,7 +20,7 @@ pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
 }
 
 #[cfg(test)]
-mod test{
+mod tests {
     use super::*;
 
     # [test]

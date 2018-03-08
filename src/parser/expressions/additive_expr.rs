@@ -24,7 +24,7 @@ named!(parse_additive_operator<&str, ((AdditiveOperator, Term))>,
 );
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::expressions::binary::AdditiveOperator::*;

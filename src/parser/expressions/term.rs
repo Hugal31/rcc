@@ -23,7 +23,7 @@ named!(parse_term_operation<&str, (TermOperation, Factor)>,
 );
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::expressions::binary::TermOperation::*;

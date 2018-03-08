@@ -63,7 +63,7 @@ named!(parse_bitwise<&str, Factor>,
 named!(parse_int_literal<&str, Factor>, map!(map_res!(digit, i32::from_str), Factor::from));
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::{AdditiveExpression, Term};

@@ -13,7 +13,7 @@ named!(pub parse_statement<&str, Statement>,
 );
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::expressions::unary::UnaryOperator::*;
