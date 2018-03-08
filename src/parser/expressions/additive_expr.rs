@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use c::{AdditiveExpression, Term};
+use c::expressions::{AdditiveExpression, Term};
 use c::expressions::binary::AdditiveOperator;
 use super::term::parse_term;
 
@@ -28,8 +28,8 @@ mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::expressions::binary::AdditiveOperator::*;
-    use c::Term;
-    use c::Factor::*;
+    use c::expressions::Term;
+    use c::expressions::Factor::*;
 
     #[test]
     fn test_parse_factor() {

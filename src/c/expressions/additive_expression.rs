@@ -45,7 +45,7 @@ impl Compile for AdditiveExpression {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use c::Factor;
+    use c::expressions::Factor;
     use c::tests::test_compile;
 
     #[test]

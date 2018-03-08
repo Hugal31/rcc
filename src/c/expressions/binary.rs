@@ -56,6 +56,37 @@ impl fmt::Display for ParseTermOperationError {
     }
 }
 
+#[derive(Clone,Copy,Debug,PartialEq)]
+pub enum RelationalOperator {
+    LessThan,
+    GreaterThan,
+    LessOrEqual,
+    GreaterOrEqual,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ParseRelationalOperatorError {}
+
+impl fmt::Display for ParseRelationalOperatorError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        "provided string was not '<', '>', ' <=' or '>='".fmt(f)
+    }
+}
+
+impl FromStr for RelationalOperator {
+    type Err = ParseRelationalOperatorError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "<"  => Ok(RelationalOperator::LessThan),
+            ">"  => Ok(RelationalOperator::GreaterThan),
+            "<=" => Ok(RelationalOperator::LessOrEqual),
+            ">=" => Ok(RelationalOperator::GreaterOrEqual),
+            _    => Err(ParseRelationalOperatorError{}),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -72,5 +103,13 @@ mod tests {
         assert_eq!("*".parse(), Ok(TermOperation::Multiplication));
         assert_eq!("/".parse(), Ok(TermOperation::Division));
         assert_eq!("nop".parse::<TermOperation>(), Err(ParseTermOperationError{}));
+    }
+
+    #[test]
+    fn test_parse_relational_operator() {
+        assert_eq!("<".parse(), Ok(RelationalOperator::LessThan));
+        assert_eq!(">".parse(), Ok(RelationalOperator::GreaterThan));
+        assert_eq!("<=".parse(), Ok(RelationalOperator::LessOrEqual));
+        assert_eq!(">=".parse(), Ok(RelationalOperator::GreaterOrEqual));
     }
 }

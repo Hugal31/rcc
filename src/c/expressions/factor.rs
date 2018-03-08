@@ -1,14 +1,14 @@
 use std::io::{Result, Write};
 
 use c::Compile;
-use super::additive_expression::AdditiveExpression;
+use super::Expression;
 use super::unary::UnaryOperator;
 
 #[derive(Debug,PartialEq)]
 pub enum Factor {
     Literal(i32),
     Unary(UnaryOperator, Box<Factor>),
-    Expr(Box<AdditiveExpression>),
+    Expr(Box<Expression>),
 }
 
 impl Compile for Factor {

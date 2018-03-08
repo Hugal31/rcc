@@ -33,7 +33,8 @@ pub fn parse(input: &str) -> Function {
 mod tests {
     use super::*;
     use nom::IResult::Done;
-    use c::{AdditiveExpression, Term, Factor, Statement};
+    use c::Statement;
+    use c::expressions::{RelationalExpression, AdditiveExpression, Term, Factor};
 
     #[test]
     fn parse_simple_function() {
@@ -45,7 +46,7 @@ mod tests {
                    Done("",
                         Function {
                             name: "main".to_owned(),
-                            statements: vec![Statement::Return(AdditiveExpression::new(Term::new(Factor::Literal(42))))]
+                            statements: vec![Statement::Return(RelationalExpression::new(AdditiveExpression::new(Term::new(Factor::Literal(42)))))]
                         }));
     }
 }
