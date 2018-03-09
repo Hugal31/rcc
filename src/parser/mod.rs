@@ -3,9 +3,8 @@ mod identifier;
 mod statements;
 mod types;
 
-pub use self::identifier::parse_identifier;
-
 use c::Function;
+use self::identifier::parse_identifier;
 use self::statements::parse_statement;
 use self::types::parse_type;
 
@@ -34,19 +33,19 @@ mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::Statement;
-    use c::expressions::{RelationalExpression, AdditiveExpression, Term, Factor};
+    use c::expressions::{Expression, Factor};
 
     #[test]
     fn parse_simple_function() {
 
-        let function = "int main() {\
+        let function = "int main() {
     return 42;\
-    }";
+}";
         assert_eq!(parse_function(function),
                    Done("",
                         Function {
                             name: "main".to_owned(),
-                            statements: vec![Statement::Return(RelationalExpression::new(AdditiveExpression::new(Term::new(Factor::Literal(42)))))]
+                            statements: vec![Statement::Return(Expression::from(Factor::Literal(42)))]
                         }));
     }
 }

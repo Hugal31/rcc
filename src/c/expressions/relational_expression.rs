@@ -48,6 +48,15 @@ mod tests {
     use c::expressions::{Factor, Term};
     use super::*;
 
+    impl From<Factor> for RelationalExpression {
+        fn from(factor: Factor) -> RelationalExpression {
+            RelationalExpression{
+                additive_expression: AdditiveExpression::from(factor),
+                operations: Vec::new(),
+            }
+        }
+    }
+
     #[test]
     fn test_compile_less_or_equal() {
         let twenty_one = AdditiveExpression::new(Term::new(Factor::Literal(21)));

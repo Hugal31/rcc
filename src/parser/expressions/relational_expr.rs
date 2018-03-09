@@ -35,7 +35,7 @@ mod tests {
     #[test]
     fn test_parse_factor() {
         let expression = parse_relational_expression("42");
-        assert_eq!(expression, Done("", RelationalExpression::new(AdditiveExpression::new(Term::new(Factor::Literal(42))))));
+        assert_eq!(expression, Done("", RelationalExpression::from(Factor::Literal(42))));
     }
 
     #[test]

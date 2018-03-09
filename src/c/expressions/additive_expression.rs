@@ -45,8 +45,17 @@ impl Compile for AdditiveExpression {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use c::expressions::Factor;
+    use c::expressions::{Factor, Term};
     use c::tests::test_compile;
+
+    impl From<Factor> for AdditiveExpression {
+        fn from(factor: Factor) -> AdditiveExpression {
+            AdditiveExpression{
+                term: Term::new(factor),
+                operations: Vec::new(),
+            }
+        }
+    }
 
     #[test]
     fn test_compile_addition() {

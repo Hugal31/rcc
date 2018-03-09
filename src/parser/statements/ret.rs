@@ -16,10 +16,10 @@ mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::Statement;
-    use c::expressions::{AdditiveExpression, Term, Factor, RelationalExpression};
+    use c::expressions::{Expression, Factor};
 
     #[test]
     fn test_parse_return() {
-        assert_eq!(parse_return("return 42"), Done("", Statement::Return(RelationalExpression::new(AdditiveExpression::new(Term::new(Factor::Literal(42)))))));
+        assert_eq!(parse_return("return 42"), Done("", Statement::Return(Expression::from(Factor::Literal(42)))));
     }
 }
