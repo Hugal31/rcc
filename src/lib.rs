@@ -1,3 +1,5 @@
+extern crate memchr;
+
 #[macro_use] extern crate nom;
 
 use std::fs::File;

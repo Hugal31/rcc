@@ -1,8 +1,10 @@
 use std::io::{Result, Write};
 
+use memchr::memchr;
+
 pub struct IndentWriter<'a, W: 'a>
     where W: Write {
-    new_line: bool,
+    is_new_line: bool,
     inner: &'a mut W,
 }
 
@@ -10,46 +12,79 @@ impl<'a, W> IndentWriter<'a, W>
     where W: Write {
     pub fn new(inner: &'a mut W) -> IndentWriter<'a, W> {
         IndentWriter{
-            new_line: true,
+            is_new_line: true,
             inner,
         }
     }
 }
 
-/// TODO Use other thing than writer
+const TAB: &[u8; 1] = b"\t";
+    
 impl<'a, W> Write for IndentWriter<'a, W>
     where W: Write {
+
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
-        let mut tmp_buf = buf.to_vec();
-        if self.new_line {
-            tmp_buf.insert(0, b'\t');
-            self.new_line = false;
-        }
-
-        let mut offset = 0;
-        while let Some(idx) = tmp_buf[offset..].iter().position(|&c| c == b'\n') {
-            offset += idx + 1;
-            if offset == tmp_buf.len() {
-                break;
+        if self.is_new_line {
+            if self.inner.write(TAB)? == 0 {
+                return Ok(0);
             }
-            tmp_buf.insert(offset, b'\t');
+            self.is_new_line = false;
         }
 
-        if buf.last() == Some(&b'\n') {
-            self.new_line = true;
+        if let Some(idx) = memchr(b'\n', buf) {
+            let result = self.inner.write(&buf[..idx + 1]);
+            match result {
+                Ok(size) if size == idx + 1 => self.is_new_line = true,
+                _ => (),
+            }
+            result
+        } else {
+            self.inner.write(buf)
         }
-
-        self.inner.write_all(&tmp_buf).map(|_| buf.len())
     }
 
     fn flush(&mut self) -> Result<()> {
         self.inner.flush()
+    }
+
+    fn write_all(&mut self, mut buf: &[u8]) -> Result<()> {
+        use std::io::{Error, ErrorKind};
+        while !buf.is_empty() {
+            let was_new_line = self.is_new_line;
+            match self.write(buf) {
+                Ok(0) if was_new_line == self.is_new_line => return Err(Error::new(ErrorKind::WriteZero,
+                                                                                      "failed to write whole buffer")),
+                Ok(n) => buf = &buf[n..],
+                Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
+                Err(e) => return Err(e),
+            }
+        }
+        Ok(())
     }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    struct SlowWriter {
+        pub speed: usize,
+        pub inner: Vec<u8>,
+    }
+
+    impl Write for SlowWriter {
+        fn write(&mut self, buf: &[u8]) -> Result<usize> {
+            if buf.len() <= self.speed {
+                self.inner.write(buf)
+            } else {
+                self.inner.write(&buf[..self.speed])
+            }
+        }
+
+        fn flush(&mut self) -> Result<()> {
+            self.inner.flush()
+        }
+    }
 
     #[test]
     fn test_indent_single_line() {
@@ -77,7 +112,7 @@ mod tests {
     fn test_size_without_indent() {
         let mut buf = vec!();
         let mut writer = IndentWriter::new(&mut buf);
-        let text = b"Line 1\nLine 2\n";
+        let text = b"Line 1\n";
         let text_size = text.len();
         let size = writer.write(text).unwrap();
         assert_eq!(size, text_size);
@@ -92,5 +127,45 @@ mod tests {
             writer.write_all(b" 1\n").unwrap();
         }
         assert_eq!(buf, b"\tLine 1\n")
+    }
+
+    #[test]
+    fn test_with_slow_writer() {
+        let mut slow_writer = SlowWriter{
+            speed: 2,
+            inner: vec!(),
+        };
+        {
+            let mut writer = IndentWriter::new(&mut slow_writer);
+            writer.write_all(b"Line\n").unwrap();
+        }
+        assert_eq!(slow_writer.inner, b"\tLine\n");
+    }
+
+    #[test]
+    fn test_with_1_byte_slow_writer() {
+        let mut slow_writer = SlowWriter{
+            speed: 1,
+            inner: vec!(),
+        };
+        {
+            let mut writer = IndentWriter::new(&mut slow_writer);
+            writer.write_all(b"Line\n").unwrap();
+        }
+        assert_eq!(slow_writer.inner, b"\tLine\n");
+    }
+
+    #[test]
+    fn test_with_0_byte_slow_buffer() {
+        use std::io::{ErrorKind};
+
+        let mut slow_writer = SlowWriter{
+            speed: 0,
+            inner: vec!(),
+        };
+        let mut writer = IndentWriter::new(&mut slow_writer);
+        let result = writer.write_all(b"Line\n");
+        assert!(result.is_err());
+        assert_eq!(result.unwrap_err().kind(), ErrorKind::WriteZero);
     }
 }
