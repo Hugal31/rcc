@@ -20,5 +20,7 @@ fn main() {
 
     let input_file = matches.value_of("INPUT").unwrap();
     let output_file = matches.value_of("OUTPUT").unwrap();
-    rcc::compile_file(input_file, output_file).unwrap();
+    if rcc::compile_file(input_file, output_file).is_err() {
+        ::std::process::exit(1);
+    }
 }

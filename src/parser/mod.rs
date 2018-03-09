@@ -23,10 +23,10 @@ named!(parse_function<&str, Function>,
     )
 );
 
-pub fn parse(input: &str) -> Function {
+pub fn parse(input: &str) -> Result<Function, ::nom::Err> {
     let r = parse_function(input);
 
-    r.to_result().expect("Parsing error")
+    r.to_result()
 }
 
 #[cfg(test)]
