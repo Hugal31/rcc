@@ -2,14 +2,16 @@ use std::io::{Result, Write};
 
 pub struct IndentWriter<'a, W: 'a>
     where W: Write {
-    inner: &'a mut W
+    new_line: bool,
+    inner: &'a mut W,
 }
 
 impl<'a, W> IndentWriter<'a, W>
     where W: Write {
     pub fn new(inner: &'a mut W) -> IndentWriter<'a, W> {
         IndentWriter{
-            inner
+            new_line: true,
+            inner,
         }
     }
 }
@@ -19,7 +21,10 @@ impl<'a, W> Write for IndentWriter<'a, W>
     where W: Write {
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
         let mut tmp_buf = buf.to_vec();
-        tmp_buf.insert(0, b'\t');
+        if self.new_line {
+            tmp_buf.insert(0, b'\t');
+            self.new_line = false;
+        }
 
         let mut offset = 0;
         while let Some(idx) = tmp_buf[offset..].iter().position(|&c| c == b'\n') {
@@ -28,6 +33,10 @@ impl<'a, W> Write for IndentWriter<'a, W>
                 break;
             }
             tmp_buf.insert(offset, b'\t');
+        }
+
+        if buf.last() == Some(&b'\n') {
+            self.new_line = true;
         }
 
         self.inner.write_all(&tmp_buf).map(|_| buf.len())
@@ -72,5 +81,16 @@ mod tests {
         let text_size = text.len();
         let size = writer.write(text).unwrap();
         assert_eq!(size, text_size);
+    }
+
+    #[test]
+    fn test_write_two_time() {
+        let mut buf = vec!();
+        {
+            let mut writer = IndentWriter::new(&mut buf);
+            writer.write_all(b"Line").unwrap();
+            writer.write_all(b" 1\n").unwrap();
+        }
+        assert_eq!(buf, b"\tLine 1\n")
     }
 }
