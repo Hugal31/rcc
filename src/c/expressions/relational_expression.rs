@@ -45,7 +45,7 @@ impl Compile for RelationalExpression {
 #[cfg(test)]
 mod tests {
     use c::tests::test_compile;
-    use c::expressions::{Factor, Term};
+    use c::expressions::Factor;
     use super::*;
 
     impl From<Factor> for RelationalExpression {
@@ -59,8 +59,8 @@ mod tests {
 
     #[test]
     fn test_compile_less_or_equal() {
-        let twenty_one = AdditiveExpression::new(Term::new(Factor::Literal(21)));
-        let fourth_two = AdditiveExpression::new(Term::new(Factor::Literal(42)));
+        let twenty_one = AdditiveExpression::from(Factor::Literal(21));
+        let fourth_two = AdditiveExpression::from(Factor::Literal(42));
         let expression = RelationalExpression{
             additive_expression: twenty_one,
             operations: vec![(RelationalOperator::LessThan, fourth_two)],

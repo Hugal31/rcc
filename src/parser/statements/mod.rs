@@ -19,12 +19,12 @@ mod tests {
     use c::expressions::unary::UnaryOperator::*;
     use c::expressions::Factor::*;
     use c::Statement::*;
-    use c::expressions::{AdditiveExpression, Term, RelationalExpression};
+    use c::expressions::Expression;
 
     #[test]
     fn test_parse_statement() {
-        assert_eq!(parse_statement("return 42;"), Done("", Return(RelationalExpression::new(AdditiveExpression::new(Term::new(Literal(42)))))));
+        assert_eq!(parse_statement("return 42;"), Done("", Return(Expression::from(Literal(42)))));
         assert_eq!(parse_statement("return -42;"),
-                   Done("", Return(RelationalExpression::new(AdditiveExpression::new(Term::new(Unary(Negation, Box::from(Literal(42)))))))));
+                   Done("", Return(Expression::from(Unary(Negation, Box::from(Literal(42)))))));
     }
 }
