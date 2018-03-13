@@ -1,16 +1,17 @@
 mod additive_expr;
 mod equality_expr;
-mod relational_expr;
 mod factor;
+mod logical_and_expr;
+mod relational_expr;
 mod term;
 
 use nom::IResult;
 
 use c::expressions::{BinaryOperator, Expression};
-use self::equality_expr::parse_equality_expression;
+use self::logical_and_expr::parse_logical_and_expression;
 
 pub fn parse_expression(input: &str) -> IResult<&str, Expression> {
-    parse_equality_expression(input)
+    parse_logical_and_expression(input)
 }
 
 pub fn fold_binary_expression(operations: (Expression, Vec<(BinaryOperator, Expression)>)) -> Expression {
