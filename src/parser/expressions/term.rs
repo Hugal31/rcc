@@ -1,22 +1,20 @@
 use std::str::FromStr;
-use c::expressions::{Factor, Term};
-use c::expressions::binary::TermOperation;
+
+use c::expressions::{Expression, BinaryOperator};
+use super::fold_binary_expression;
 use super::factor::parse_factor;
 
-named!(pub parse_term<&str, Term>,
-    do_parse!(
+named!(pub parse_term<&str, Expression>,
+    map!(do_parse!(
         factor: parse_factor >>
         operations: many0!(parse_term_operation) >>
-        (Term{
-            factor,
-            operations,
-        })
-    )
+        (factor, operations)
+    ), fold_binary_expression)
 );
 
-named!(parse_term_operation<&str, (TermOperation, Factor)>,
+named!(parse_term_operation<&str, (BinaryOperator, Expression)>,
     ws!(do_parse!(
-        operator: map_res!(alt!(tag!("*") | tag!("/")), TermOperation::from_str) >>
+        operator: map_res!(alt!(tag!("*") | tag!("/")), BinaryOperator::from_str) >>
         expr: parse_factor >>
         (operator, expr)
     ))
@@ -24,26 +22,24 @@ named!(parse_term_operation<&str, (TermOperation, Factor)>,
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use nom::IResult::Done;
-    use c::expressions::binary::TermOperation::*;
-    use c::expressions::Term;
-    use c::expressions::Factor::*;
+    use c::Expression::*;
+    use c::expressions::BinaryOperator;
+    use super::*;
 
     #[test]
     fn test_parse_factor() {
         let term = parse_term("42");
-        assert_eq!(term, Done("", Term::new(Literal(42))));
+        assert_eq!(term, Done("", Constant(42)));
     }
 
     #[test]
     fn test_parse_multiplication() {
         let term = parse_term("42*23");
         let term_with_space = parse_term("42 * 23");
-        assert_eq!(term, Done("", Term{
-            factor: Literal(42),
-            operations: vec![(Multiplication, Literal(23))],
-        }));
+        assert_eq!(term, Done("", BinOp(BinaryOperator::Multiplication,
+                                        Box::new(Constant(42)),
+                                        Box::new(Constant(23)))));
         assert_eq!(term, term_with_space);
     }
 }

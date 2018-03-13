@@ -17,14 +17,13 @@ mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::expressions::unary::UnaryOperator::*;
-    use c::expressions::Factor::*;
     use c::Statement::*;
-    use c::expressions::Expression;
+    use c::Expression::*;
 
     #[test]
     fn test_parse_statement() {
-        assert_eq!(parse_statement("return 42;"), Done("", Return(Expression::from(Literal(42)))));
+        assert_eq!(parse_statement("return 42;"), Done("", Return(Constant(42))));
         assert_eq!(parse_statement("return -42;"),
-                   Done("", Return(Expression::from(Unary(Negation, Box::from(Literal(42)))))));
+                   Done("", Return(UnOp(Negation, Box::from(Constant(42))))));
     }
 }

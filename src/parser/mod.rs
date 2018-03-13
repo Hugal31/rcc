@@ -33,7 +33,7 @@ mod tests {
     use super::*;
     use nom::IResult::Done;
     use c::Statement;
-    use c::expressions::{Expression, Factor};
+    use c::Expression;
 
     #[test]
     fn parse_simple_function() {
@@ -45,7 +45,7 @@ mod tests {
                    Done("",
                         Function {
                             name: "main".to_owned(),
-                            statements: vec![Statement::Return(Expression::from(Factor::Literal(42)))]
+                            statements: vec![Statement::Return(Expression::Constant(42))]
                         }));
     }
 }

@@ -12,14 +12,24 @@ mod writers;
 
 use c::Compile;
 
-pub fn compile_file(input_file: &str, output_file: &str) -> Result<(), &'static str> {
+pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) -> Result<(), &'static str> {
     let mut input = File::open(input_file).map_err(|_| "Invalid file")?;
 
     let ast = get_ast(&mut input)
         .map_err(|_| "Compilation error")?;
-    let mut child = get_cc_command(output_file);
-    ast.compile(child.stdin.as_mut().expect("Failed to open stdin"))
-        .map_err(|_| "Write error")
+
+    if output_assembly {
+        let mut output = File::create(output_file).map_err(|_| "Failed to create ouput file")?;
+        ast.compile(&mut output)
+            .map_err(|_| "Write error")
+    } else {
+        let mut child = get_cc_command(output_file);
+        ast.compile(child.stdin.as_mut().expect("Failed to open stdin"))
+            .map_err(|_| "Write error")?;
+        child.wait()
+            .map(|_| ())
+            .map_err(|_| "Child error")
+    }
 }
 
 fn get_cc_command(output_file: &str) -> Child {

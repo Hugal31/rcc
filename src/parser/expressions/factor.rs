@@ -2,10 +2,10 @@ use std::str::FromStr;
 
 use nom::digit;
 
-use c::expressions::{Factor, UnaryOperator};
+use c::expressions::{Expression, UnaryOperator};
 use super::parse_expression;
 
-named!(pub parse_factor<&str, Factor>,
+named!(pub parse_factor<&str, Expression>,
     alt!(
         parse_int_literal
         | parse_expression_in_parenthesis
@@ -13,96 +13,71 @@ named!(pub parse_factor<&str, Factor>,
     )
 );
 
-named!(parse_expression_in_parenthesis<&str, Factor>,
+named!(parse_expression_in_parenthesis<&str, Expression>,
     ws!(do_parse!(
         char!('(') >>
         expr: parse_expression >>
         char!(')') >>
-        (Factor::Expr(Box::new(expr)))
+        (expr)
     ))
 );
 
-named!(parse_unary_operation<&str, Factor>,
-    alt!(
-        parse_negation
-        | parse_local_negation
-        | parse_bitwise
-    )
+named!(parse_unary_operation<&str, Expression>,
+    ws!(do_parse!(
+        op: map_res!(alt!(tag!("-") | tag!("~") | tag!("!")), UnaryOperator::from_str) >>
+        expr: parse_factor >>
+        (Expression::UnOp(op, Box::new(expr)))
+    ))
 );
 
-named!(parse_negation<&str, Factor>,
-    ws!(
-        do_parse!(
-            char!('-') >>
-            expr: parse_factor >>
-            (Factor::Unary(UnaryOperator::Negation, Box::from(expr)))
-        )
+named!(parse_int_literal<&str, Expression>,
+    do_parse!(
+        constant: map_res!(digit, i32::from_str) >>
+        (Expression::Constant(constant))
     )
 );
-
-named!(parse_local_negation<&str, Factor>,
-    ws!(
-        do_parse!(
-            char!('!') >>
-            expr: parse_factor >>
-            (Factor::Unary(UnaryOperator::LocalNegation, Box::from(expr)))
-        )
-    )
-);
-
-named!(parse_bitwise<&str, Factor>,
-    ws!(
-        do_parse!(
-            char!('~') >>
-            expr: parse_factor >>
-            (Factor::Unary(UnaryOperator::Bitwise, Box::from(expr)))
-        )
-    )
-);
-
-named!(parse_int_literal<&str, Factor>, map!(map_res!(digit, i32::from_str), Factor::from));
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use nom::IResult::Done;
-    use c::expressions::Expression;
-    use c::expressions::Factor::*;
+    use c::Expression::*;
+    use c::expressions::UnaryOperator;
+    use super::*;
 
     #[test]
     fn test_parse_simple_factor() {
-        assert_eq!(parse_factor("42"), Done("", Literal(42)));
+        assert_eq!(parse_factor("42"), Done("", Expression::Constant(42)));
     }
 
     #[test]
     fn test_parse_unary_operator() {
         assert_eq!(parse_factor("!42"),
                    Done("",
-                        Unary(UnaryOperator::LocalNegation,
-                                          Box::new(Literal(42)))));
+                        UnOp(UnaryOperator::LocalNegation,
+                             Box::new(Constant(42)))));
         assert_eq!(parse_factor("!!42"),
                    Done("",
-                        Unary(UnaryOperator::LocalNegation,
-                                          Box::new(Unary(UnaryOperator::LocalNegation,Box::new(Literal(42)))))));
+                        UnOp(UnaryOperator::LocalNegation,
+                             Box::new(UnOp(UnaryOperator::LocalNegation,Box::new(Constant(42)))))));
         assert_eq!(parse_factor("~42"),
                    Done("",
-                        Unary(UnaryOperator::Bitwise,
-                                     Box::new(Literal(42)))));
+                        UnOp(UnaryOperator::Bitwise,
+                             Box::new(Constant(42)))));
         assert_eq!(parse_factor("-42"),
                    Done("",
-                        Unary(UnaryOperator::Negation,
-                                          Box::new(Literal(42)))));
+                        UnOp(UnaryOperator::Negation,
+                             Box::new(Constant(42)))));
     }
 
     #[test]
     fn test_parse_int_literal() {
-        assert_eq!(parse_int_literal("42"), Done("", Literal(42)));
+        assert_eq!(parse_int_literal("42"), Done("", Constant(42)));
     }
 
     #[test]
     fn test_parse_expression_in_parenthesis() {
         let factor = parse_factor("(42)");
-        assert_eq!(factor, Done("", Expr(Box::new(Expression::from(Literal(42))))));
+        assert_eq!(factor, Done("", Constant(42)));
 
         let factor_with_space = parse_factor("( 42 )");
         assert_eq!(factor, factor_with_space);

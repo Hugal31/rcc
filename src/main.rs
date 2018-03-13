@@ -18,22 +18,32 @@ fn main() {
              .short("o")
              .help("Output file")
              .takes_value(true))
+        .arg(Arg::with_name("ASSEMBLY")
+            .short("s")
+            .help("Output assembly"))
         .get_matches();
 
+    let assembly = matches.is_present("ASSEMBLY");
     let input_file = matches.value_of("INPUT").unwrap();
-    let default_output = get_output_file_name(input_file);
+    let default_output = get_output_file_name(input_file, assembly);
     let output_file = matches.value_of("OUTPUT").unwrap_or(&default_output);
-    if rcc::compile_file(input_file, output_file).is_err() {
+    if rcc::compile_file(input_file, output_file, assembly).is_err() {
         ::std::process::exit(1);
     }
 }
 
-fn get_output_file_name(input_file_name: &str) -> String {
-    if let Some(idx) = input_file_name.rfind('.') {
+fn get_output_file_name(input_file_name: &str, assembly: bool) -> String {
+    let outfile = if let Some(idx) = input_file_name.rfind('.') {
         &input_file_name[..idx]
     } else {
         "a.out"
-    }.to_owned()
+    }.to_owned();
+
+    if assembly {
+        outfile + ".s"
+    } else {
+        outfile
+    }
 }
 
 #[cfg(test)]
@@ -42,8 +52,13 @@ mod tests {
 
     #[test]
     fn test_get_output_file_name() {
-        assert_eq!(get_output_file_name("test.c"), "test");
-        assert_eq!(get_output_file_name("-"), "a.out");
-        assert_eq!(get_output_file_name(".src/test.c"), ".src/test");
+        assert_eq!(get_output_file_name("test.c", false), "test");
+        assert_eq!(get_output_file_name("-", false), "a.out");
+        assert_eq!(get_output_file_name(".src/test.c", false), ".src/test");
+    }
+
+    #[test]
+    fn test_get_output_assembly_file_name() {
+        assert_eq!(get_output_file_name("test.c", true), "test.s");
     }
 }
