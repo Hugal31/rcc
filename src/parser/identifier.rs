@@ -19,6 +19,10 @@ pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
     Done(&input[input_length..], &input[0..input_length])
 }
 
+pub fn is_alphanumeric_or_underscore(ch: char) -> bool {
+    return ch.is_alphanumeric() || ch == '_';
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
