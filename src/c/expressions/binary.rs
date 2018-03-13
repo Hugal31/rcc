@@ -18,6 +18,7 @@ pub enum BinaryOperator {
     Equal,
     NotEqual,
     LogicalAnd,
+    LogicalOr,
 }
 
 impl Compile for BinaryOperator {
@@ -57,6 +58,9 @@ cmpl $0, %eax
 movl $0, %eax
 setne %al
 andb %cl, %al\n"),
+            BinaryOperator::LogicalOr => output.write_all(b"orl %ecx, %eax
+movl $0, %eax
+setne %al\n")
         }
     }
 }
@@ -87,6 +91,7 @@ impl FromStr for BinaryOperator {
             "==" => Ok(BinaryOperator::Equal),
             "!=" => Ok(BinaryOperator::NotEqual),
             "&&" => Ok(BinaryOperator::LogicalAnd),
+            "||" => Ok(BinaryOperator::LogicalOr),
             _    => Err(ParseBinaryOperationError{}),
         }
     }
@@ -108,6 +113,7 @@ mod tests {
         assert_eq!("<=".parse(), Ok(LessOrEqual));
         assert_eq!(">=".parse(), Ok(GreaterOrEqual));
         assert_eq!("&&".parse(), Ok(LogicalAnd));
+        assert_eq!("||".parse(), Ok(LogicalOr));
         assert_eq!("nop".parse::<BinaryOperator>(), Err(ParseBinaryOperationError{}));
     }
 }
