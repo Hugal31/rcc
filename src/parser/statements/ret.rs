@@ -14,7 +14,7 @@ named!(pub parse_return<&str, Statement>,
 );
 
 fn continue_ident(input: &str) -> IResult<&str, &str> {
-    if input.len() == 0 {
+    if input.is_empty() {
         return IResult::Incomplete(Needed::Size(1));
     }
 

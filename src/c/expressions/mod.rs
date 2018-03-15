@@ -8,8 +8,6 @@ use super::Compile;
 pub use self::binary::*;
 pub use self::unary::*;
 
-//pub type Expression = EqualityExpression;
-
 #[derive(Clone,Debug,PartialEq)]
 pub enum Expression {
     Constant(i32),

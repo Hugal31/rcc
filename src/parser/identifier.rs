@@ -20,7 +20,7 @@ pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
 }
 
 pub fn is_alphanumeric_or_underscore(ch: char) -> bool {
-    return ch.is_alphanumeric() || ch == '_';
+    ch.is_alphanumeric() || ch == '_'
 }
 
 #[cfg(test)]

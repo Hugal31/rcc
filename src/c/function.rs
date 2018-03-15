@@ -1,8 +1,7 @@
 use std::io::{Result, Write};
 
+use c::{Compile, Statement};
 use writers::IndentWriter;
-use c::Compile;
-use c::Statement;
 
 #[derive(Debug, PartialEq)]
 pub struct Function {
