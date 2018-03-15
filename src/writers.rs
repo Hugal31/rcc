@@ -53,7 +53,7 @@ impl<'a, W> Write for IndentWriter<'a, W>
             let was_new_line = self.is_new_line;
             match self.write(buf) {
                 Ok(0) if was_new_line == self.is_new_line => return Err(Error::new(ErrorKind::WriteZero,
-                                                                                      "failed to write whole buffer")),
+                                                                                   "failed to write whole buffer")),
                 Ok(n) => buf = &buf[n..],
                 Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
                 Err(e) => return Err(e),
@@ -70,6 +70,15 @@ mod tests {
     struct SlowWriter {
         pub speed: usize,
         pub inner: Vec<u8>,
+    }
+
+    impl SlowWriter {
+        pub fn with_speed(speed: usize) -> SlowWriter {
+            SlowWriter{
+                speed,
+                inner: Vec::new(),
+            }
+        }
     }
 
     impl Write for SlowWriter {
@@ -131,10 +140,7 @@ mod tests {
 
     #[test]
     fn test_with_slow_writer() {
-        let mut slow_writer = SlowWriter{
-            speed: 2,
-            inner: vec!(),
-        };
+        let mut slow_writer = SlowWriter::with_speed(2);
         {
             let mut writer = IndentWriter::new(&mut slow_writer);
             writer.write_all(b"Line\n").unwrap();
@@ -144,10 +150,7 @@ mod tests {
 
     #[test]
     fn test_with_1_byte_slow_writer() {
-        let mut slow_writer = SlowWriter{
-            speed: 1,
-            inner: vec!(),
-        };
+        let mut slow_writer = SlowWriter::with_speed(1);
         {
             let mut writer = IndentWriter::new(&mut slow_writer);
             writer.write_all(b"Line\n").unwrap();
@@ -159,10 +162,7 @@ mod tests {
     fn test_with_0_byte_slow_buffer() {
         use std::io::{ErrorKind};
 
-        let mut slow_writer = SlowWriter{
-            speed: 0,
-            inner: vec!(),
-        };
+        let mut slow_writer = SlowWriter::with_speed(0);
         let mut writer = IndentWriter::new(&mut slow_writer);
         let result = writer.write_all(b"Line\n");
         assert!(result.is_err());
