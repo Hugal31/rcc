@@ -6,14 +6,22 @@ mod logical_or_expr;
 mod relational_expr;
 mod term;
 
-use nom::IResult;
-
 use c::expressions::{BinaryOperator, Expression};
+use super::identifier::parse_identifier;
 use self::logical_or_expr::parse_logical_or_expression;
 
-pub fn parse_expression(input: &str) -> IResult<&str, Expression> {
-    parse_logical_or_expression(input)
-}
+named!(pub parse_expression<&str, Expression>,
+    alt!(parse_assignment | parse_logical_or_expression)
+);
+
+named!(parse_assignment<&str, Expression>,
+    ws!(do_parse!(
+        name: parse_identifier >>
+        char!('=') >>
+        exp: parse_expression >>
+        (Expression::Assign(name.to_owned(), Box::new(exp)))
+    ))
+);
 
 pub fn fold_binary_expression(operations: (Expression, Vec<(BinaryOperator, Expression)>)) -> Expression {
     let expr = operations.0;
@@ -25,6 +33,7 @@ pub fn fold_binary_expression(operations: (Expression, Vec<(BinaryOperator, Expr
 
 #[cfg(test)]
 mod tests {
+    use nom::IResult::*;
     use c::Expression::*;
     use c::expressions::BinaryOperator::*;
     use super::*;
@@ -41,5 +50,11 @@ mod tests {
                                                    Box::new(Constant(15)))),
                                     Box::new(Constant(5)));
         assert_eq!(fold_binary_expression(input), expected_result);
+    }
+
+    #[test]
+    fn parse_assigment() {
+        assert_eq!(parse_expression("a = 4"),
+                   Done("", Assign("a".to_owned(), Box::new(Constant(4)))));
     }
 }

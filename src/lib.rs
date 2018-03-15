@@ -10,7 +10,7 @@ pub mod c;
 pub mod parser;
 mod writers;
 
-use c::Compile;
+use c::{Compile, Scope};
 
 pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) -> Result<(), &'static str> {
     let mut input = File::open(input_file).map_err(|_| "Invalid file")?;
@@ -18,13 +18,14 @@ pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) 
     let ast = get_ast(&mut input)
         .map_err(|_| "Compilation error")?;
 
+    let mut scope = Scope::new();
     if output_assembly {
         let mut output = File::create(output_file).map_err(|_| "Failed to create ouput file")?;
-        ast.compile(&mut output)
+        ast.compile(&mut output, &mut scope)
             .map_err(|_| "Write error")
     } else {
         let mut child = get_cc_command(output_file);
-        ast.compile(child.stdin.as_mut().expect("Failed to open stdin"))
+        ast.compile(child.stdin.as_mut().expect("Failed to open stdin"), &mut scope)
             .map_err(|_| "Write error")?;
         child.wait()
             .map(|_| ())

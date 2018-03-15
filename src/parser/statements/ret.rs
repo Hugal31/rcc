@@ -1,8 +1,6 @@
-use nom::{ErrorKind, IResult, Needed};
-
 use c::Statement;
 use parser::expressions::parse_expression;
-use parser::identifier::is_alphanumeric_or_underscore;
+use parser::identifier::continue_ident;
 
 named!(pub parse_return<&str, Statement>,
     do_parse!(
@@ -12,18 +10,6 @@ named!(pub parse_return<&str, Statement>,
         (Statement::Return(expr))
     )
 );
-
-fn continue_ident(input: &str) -> IResult<&str, &str> {
-    if input.is_empty() {
-        return IResult::Incomplete(Needed::Size(1));
-    }
-
-    if is_alphanumeric_or_underscore(input.chars().next().unwrap()) {
-        IResult::Done(&input[1..], &input[..1])
-    } else {
-        IResult::Error(error_position!(ErrorKind::Custom(1), input))
-    }
-}
 
 #[cfg(test)]
 mod tests {

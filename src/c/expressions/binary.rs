@@ -2,7 +2,7 @@ use std::fmt;
 use std::io;
 use std::str::FromStr;
 
-use c::Compile;
+use c::{Compile, Scope};
 
 #[derive(Clone,Copy,Debug,PartialEq)]
 pub enum BinaryOperator {
@@ -23,7 +23,7 @@ pub enum BinaryOperator {
 
 impl Compile for BinaryOperator {
     // RValue should be in ECX, LValue in EAX
-    fn compile<O>(&self, output: &mut O) -> io::Result<()> where O: io::Write {
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> io::Result<()> where O: io::Write {
         match *self {
             BinaryOperator::Addition => output.write_all(b"addl %ecx, %eax\n"),
             BinaryOperator::Subtraction => output.write_all(b"xchg %ecx, %eax

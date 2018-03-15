@@ -1,7 +1,8 @@
 use std::fmt;
 use std::io;
 use std::str::FromStr;
-use c::Compile;
+
+use c::{Compile, Scope};
 
 #[derive(Clone,Copy,Debug,PartialEq)]
 pub enum UnaryOperator {
@@ -11,7 +12,7 @@ pub enum UnaryOperator {
 }
 
 impl Compile for UnaryOperator {
-    fn compile<O>(&self, output: &mut O) -> io::Result<()> where O: io::Write {
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> io::Result<()> where O: io::Write {
         match *self {
             UnaryOperator::Negation => {
                 output.write_all(b"neg %eax\n")?;

@@ -3,11 +3,13 @@ use std::str::FromStr;
 use nom::digit;
 
 use c::expressions::{Expression, UnaryOperator};
+use parser::identifier::parse_identifier;
 use super::parse_expression;
 
 named!(pub parse_factor<&str, Expression>,
     alt!(
         parse_int_literal
+        | parse_variable
         | parse_expression_in_parenthesis
         | parse_unary_operation
     )
@@ -34,6 +36,13 @@ named!(parse_int_literal<&str, Expression>,
     do_parse!(
         constant: map_res!(digit, i32::from_str) >>
         (Expression::Constant(constant))
+    )
+);
+
+named!(parse_variable<&str, Expression>,
+    do_parse!(
+        name: parse_identifier >>
+        (Expression::Var(name.to_owned()))
     )
 );
 
@@ -71,7 +80,12 @@ mod tests {
 
     #[test]
     fn test_parse_int_literal() {
-        assert_eq!(parse_int_literal("42"), Done("", Constant(42)));
+        assert_eq!(parse_factor("42"), Done("", Constant(42)));
+    }
+
+    #[test]
+    fn test_parse_variable() {
+        assert_eq!(parse_factor("a"), Done("", Var("a".to_owned())));
     }
 
     #[test]
