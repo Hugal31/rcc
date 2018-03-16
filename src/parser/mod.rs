@@ -22,7 +22,7 @@ named!(parse_function<&str, Function>,
     )
 );
 
-pub fn parse(input: &str) -> Result<Function, ::nom::Err> {
+pub fn parse(input: &str) -> Result<Function, ::nom::Err<&str>> {
     let r = parse_function(input);
 
     r.to_result()

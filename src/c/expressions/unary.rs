@@ -1,8 +1,10 @@
+use std::result::Result as StdResult;
 use std::fmt;
 use std::io;
 use std::str::FromStr;
 
 use c::{Compile, Scope};
+use errors::*;
 
 #[derive(Clone,Copy,Debug,PartialEq)]
 pub enum UnaryOperator {
@@ -12,7 +14,7 @@ pub enum UnaryOperator {
 }
 
 impl Compile for UnaryOperator {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> io::Result<()> where O: io::Write {
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()> where O: io::Write {
         match *self {
             UnaryOperator::Negation => {
                 output.write_all(b"neg %eax\n")?;
@@ -41,7 +43,7 @@ impl fmt::Display for ParseUnaryOperatorError {
 impl FromStr for UnaryOperator {
     type Err = ParseUnaryOperatorError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match s {
             "~" => Ok(UnaryOperator::Bitwise),
             "!" => Ok(UnaryOperator::LocalNegation),

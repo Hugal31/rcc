@@ -1,4 +1,4 @@
-use std::io::{Result, Write};
+use std::io::Write;
 
 mod scope;
 
@@ -6,6 +6,8 @@ pub mod expressions;
 pub mod function;
 pub mod statement;
 pub mod types;
+
+use errors::*;
 
 pub use self::expressions::Expression;
 pub use self::function::*;

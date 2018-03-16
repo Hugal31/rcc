@@ -1,6 +1,8 @@
-use std::io::{Result, Write};
+use std::io;
+use std::io::Write;
 
 use c::{Compile, Expression, Scope, Statement};
+use errors::*;
 use writers::IndentWriter;
 
 const RETURN_0: Statement = Statement::Return(Expression::Constant(0));
@@ -40,7 +42,7 @@ movl %esp, %ebp\n")?;
     }
 }
 
-pub fn write_epilogue<O>(output: &mut O) -> Result<()> where O: Write {
+pub fn write_epilogue<O>(output: &mut O) -> io::Result<()> where O: Write {
     output.write_all(b"movl %ebp, %esp
 pop %ebp
 ret\n")

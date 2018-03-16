@@ -55,7 +55,7 @@ mod tests {
         assert_eq!(parse_identifier("abcdef1234"), Done("", "abcdef1234"));
         assert_eq!(parse_identifier("_abcdef1234"), Done("", "_abcdef1234"));
         assert_eq!(parse_identifier("_abcdef1234 "), Done(" ", "_abcdef1234"));
-        assert_eq!(parse_identifier("1abc"), Error(ErrorKind::Custom(0)));
+        assert!(parse_identifier("1abc").is_err());
         assert_eq!(parse_identifier(""), Incomplete(Needed::Unknown));
         assert!(parse_identifier("int").is_err());
         assert!(parse_identifier("int ").is_err());

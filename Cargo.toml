@@ -7,5 +7,9 @@ license = "MIT"
 
 [dependencies]
 clap = "^2.29"
-memchr = "2"
-nom = "^3.2"
+error-chain = "^0.11"
+memchr = "^2"
+nom = { version = "^3.2", features = ["verbose-errors"] }
+
+[dev-dependencies.error-chain-for-dumb-ides]
+git = "https://github.com/FauxFaux/error-chain-for-dumb-ides"

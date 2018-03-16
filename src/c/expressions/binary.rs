@@ -1,8 +1,10 @@
+use std::result::Result as StdResult;
 use std::fmt;
 use std::io;
 use std::str::FromStr;
 
 use c::{Compile, Scope};
+use errors::*;
 
 #[derive(Clone,Copy,Debug,PartialEq)]
 pub enum BinaryOperator {
@@ -23,7 +25,7 @@ pub enum BinaryOperator {
 
 impl Compile for BinaryOperator {
     // RValue should be in ECX, LValue in EAX
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> io::Result<()> where O: io::Write {
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()> where O: io::Write {
         match *self {
             BinaryOperator::Addition => output.write_all(b"addl %ecx, %eax\n"),
             BinaryOperator::Subtraction => output.write_all(b"xchg %ecx, %eax
@@ -61,7 +63,7 @@ andb %cl, %al\n"),
             BinaryOperator::LogicalOr => output.write_all(b"orl %ecx, %eax
 movl $0, %eax
 setne %al\n")
-        }
+        }.map_err(|e| e.into())
     }
 }
 
@@ -77,7 +79,7 @@ impl fmt::Display for ParseBinaryOperationError {
 impl FromStr for BinaryOperator {
     type Err = ParseBinaryOperationError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match s {
             "+"  => Ok(BinaryOperator::Addition),
             "-"  => Ok(BinaryOperator::Subtraction),
