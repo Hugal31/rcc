@@ -3,7 +3,7 @@ mod identifier;
 mod statements;
 mod types;
 
-use c::Function;
+use c_ast::Function;
 use self::identifier::parse_identifier;
 use self::statements::parse_statement;
 use self::types::parse_type;
@@ -32,8 +32,7 @@ pub fn parse(input: &str) -> Result<Function, ::nom::Err<&str>> {
 mod tests {
     use super::*;
     use nom::IResult::Done;
-    use c::Statement;
-    use c::Expression;
+    use c_ast::{Expression, Statement};
 
     #[test]
     fn parse_simple_function() {

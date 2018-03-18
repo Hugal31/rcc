@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use c::expressions::{Expression, BinaryOperator};
+use c_ast::{Expression, BinaryOperator};
 use super::fold_binary_expression;
 use super::factor::parse_factor;
 
@@ -23,8 +23,8 @@ named!(parse_term_operation<&str, (BinaryOperator, Expression)>,
 #[cfg(test)]
 mod tests {
     use nom::IResult::Done;
-    use c::Expression::*;
-    use c::expressions::BinaryOperator;
+    use c_ast::BinaryOperator;
+    use c_ast::Expression::*;
     use super::*;
 
     #[test]

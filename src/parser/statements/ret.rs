@@ -1,4 +1,4 @@
-use c::Statement;
+use c_ast::Statement;
 use parser::expressions::parse_expression;
 use parser::identifier::continue_ident;
 
@@ -15,8 +15,8 @@ named!(pub parse_return<&str, Statement>,
 mod tests {
     use super::*;
     use nom::IResult::Done;
-    use c::Statement;
-    use c::Expression;
+    use c_ast::Statement;
+    use c_ast::Expression;
 
     #[test]
     fn test_parse_return() {

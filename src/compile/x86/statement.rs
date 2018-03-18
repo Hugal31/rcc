@@ -1,21 +1,12 @@
-use std::io;
+use std::io::Write;
 
-use c::{Compile, Scope, Variable};
-use c::expressions::Expression;
-use c::function::write_epilogue;
-use errors::*;
-
-#[derive(Debug,PartialEq)]
-pub enum Statement {
-    Return(Expression),
-    Declare(String, Option<Expression>),
-    Exp(Expression),
-}
+use c_ast::*;
+use compile::*;
 
 const DEFAULT_VALUE: Expression = Expression::Constant(0);
 
 impl Compile for Statement {
-    fn compile<O>(&self, output: &mut O, scope: &mut Scope) -> Result<()> where O: io::Write {
+    fn compile<O>(&self, output: &mut O, scope: &mut Scope) -> Result<()> where O: Write {
         match *self {
             Statement::Return(ref e) => {
                 e.compile(output, scope)?;

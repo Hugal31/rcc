@@ -1,4 +1,4 @@
-use c::expressions::{BinaryOperator, Expression};
+use c_ast::{BinaryOperator, Expression};
 use super::fold_binary_expression;
 use super::logical_and_expr::parse_logical_and_expression;
 
@@ -21,8 +21,8 @@ named!(parse_logical_or_operation<&str, (BinaryOperator, Expression)>,
 #[cfg(test)]
 mod tests {
     use nom::IResult::Done;
-    use c::Expression::*;
-    use c::expressions::BinaryOperator;
+    use c_ast::Expression::*;
+    use c_ast::BinaryOperator;
     use super::*;
 
     #[test]

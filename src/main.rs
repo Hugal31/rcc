@@ -28,7 +28,7 @@ fn main() {
     let default_output = get_output_file_name(input_file, assembly);
     let output_file = matches.value_of("OUTPUT").unwrap_or(&default_output);
     if let Err(e) = rcc::compile_file(input_file, output_file, assembly) {
-        eprintln!("Error: {:?}", e);
+        eprintln!("{}", e.to_string());
         ::std::process::exit(1);
     }
 }

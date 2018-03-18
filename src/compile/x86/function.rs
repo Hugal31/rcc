@@ -1,20 +1,14 @@
 use std::io;
 use std::io::Write;
 
-use c::{Compile, Expression, Scope, Statement};
-use errors::*;
+use c_ast::{Expression, Function, Statement};
+use compile::*;
 use writers::IndentWriter;
 
 const RETURN_0: Statement = Statement::Return(Expression::Constant(0));
 
-#[derive(Debug, PartialEq)]
-pub struct Function {
-    pub name: String,
-    pub statements: Vec<Statement>,
-}
-
 impl Compile for Function {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()> where O: Write {
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()> where O: io::Write {
         output.write_fmt(format_args!("\t.globl {}\n", self.name))?;
         output.write_fmt(format_args!("{}:\n", self.name))?;
 
@@ -40,10 +34,4 @@ movl %esp, %ebp\n")?;
 
         Ok(())
     }
-}
-
-pub fn write_epilogue<O>(output: &mut O) -> io::Result<()> where O: Write {
-    output.write_all(b"movl %ebp, %esp
-pop %ebp
-ret\n")
 }

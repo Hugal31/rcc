@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use nom::digit;
 
-use c::expressions::{Expression, UnaryOperator};
+use c_ast::{Expression, UnaryOperator};
 use parser::identifier::parse_identifier;
 use super::parse_expression;
 
@@ -49,8 +49,8 @@ named!(parse_variable<&str, Expression>,
 #[cfg(test)]
 mod tests {
     use nom::IResult::Done;
-    use c::Expression::*;
-    use c::expressions::UnaryOperator;
+    use c_ast::Expression::*;
+    use c_ast::expressions::UnaryOperator;
     use super::*;
 
     #[test]

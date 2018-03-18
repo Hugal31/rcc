@@ -1,6 +1,6 @@
 use nom::{ErrorKind, IResult, IResult::*, Needed};
 
-use c::KEYWORDS;
+use c_ast::KEYWORDS;
 
 pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
     let input_length = input.len();

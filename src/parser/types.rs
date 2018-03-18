@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use c::types::Type;
+use c_ast::Type;
 use super::identifier::continue_ident;
 
 named!(pub parse_type<&str, Type>,

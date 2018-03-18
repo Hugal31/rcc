@@ -5,15 +5,17 @@ extern crate memchr;
 #[cfg(intellij_type_hinting)]
 extern crate error_chain_for_dumb_ides;
 
+mod compile;
+mod writers;
+
+pub mod c_ast;
+pub mod parser;
+
 use std::fs::File;
 use std::io::Read;
 use std::process::{Child, Command, Stdio};
 
-pub mod c;
-pub mod parser;
-mod writers;
-
-use c::{Compile, Scope};
+use compile::{Compile, Scope};
 
 pub use errors::*;
 
@@ -23,9 +25,13 @@ pub mod errors {
 
     error_chain! {
         errors {
-            SyntaxError
-            VariableAlreadyExists
-            UnknownVariable
+            SyntaxError(desc: String) {
+                description("syntax error")
+                display("syntax error: {}", desc)
+            }
+        }
+        links {
+            Compile(::compile::Error, ::compile::ErrorKind);
         }
         foreign_links {
             Io(::std::io::Error);
@@ -36,8 +42,7 @@ pub mod errors {
 pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) -> Result<()> {
     let mut input = File::open(input_file).map_err(|_| "Invalid file")?;
 
-    let ast = get_ast(&mut input)
-        .map_err(|_| "Compilation error")?;
+    let ast = get_ast(&mut input)?;
 
     let mut scope = Scope::new();
     if output_assembly {
@@ -64,12 +69,10 @@ fn get_cc_command(output_file: &str) -> Child {
         .expect("Failed to execute command")
 }
 
-fn get_ast<I>(input: &mut I) -> Result<c::Function> where I: Read {
+fn get_ast<I>(input: &mut I) -> Result<c_ast::Function> where I: Read {
     let mut data = String::new();
     input.read_to_string(&mut data).unwrap();
 
-    parser::parse(&data).map_err(|e| {
-        eprintln!("{}", e);
-        ErrorKind::SyntaxError.into()
-    })
+    parser::parse(&data)
+        .map_err(|e| ErrorKind::SyntaxError(format!("{}", e)).into())
 }

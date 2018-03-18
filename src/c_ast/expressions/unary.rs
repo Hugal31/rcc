@@ -1,34 +1,12 @@
 use std::result::Result as StdResult;
 use std::fmt;
-use std::io;
 use std::str::FromStr;
-
-use c::{Compile, Scope};
-use errors::*;
 
 #[derive(Clone,Copy,Debug,PartialEq)]
 pub enum UnaryOperator {
     Negation,
     Bitwise,
     LocalNegation,
-}
-
-impl Compile for UnaryOperator {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()> where O: io::Write {
-        match *self {
-            UnaryOperator::Negation => {
-                output.write_all(b"neg %eax\n")?;
-            },
-            UnaryOperator::Bitwise => {
-                output.write_all(b"not %eax\n")?;
-            },
-            UnaryOperator::LocalNegation => {
-                output.write_all(b"cmpl $0, %eax\nmovl $0, %eax\nsete %al\n")?;
-            },
-        }
-
-        Ok(())
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -56,22 +34,6 @@ impl FromStr for UnaryOperator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use c::tests::test_compile;
-
-    #[test]
-    fn test_compile_bitwise() {
-        test_compile(UnaryOperator::Bitwise, "not %eax\n");
-    }
-
-    #[test]
-    fn test_compile_negation() {
-        test_compile(UnaryOperator::Negation, "neg %eax\n");
-    }
-
-    #[test]
-    fn test_compile_local_negation() {
-        test_compile(UnaryOperator::LocalNegation, "cmpl $0, %eax\nmovl $0, %eax\nsete %al\n");
-    }
 
     #[test]
     fn test_parse() {

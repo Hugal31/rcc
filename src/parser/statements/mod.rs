@@ -1,7 +1,6 @@
 mod ret;
 
-use c::Expression;
-use c::Statement;
+use c_ast::{Expression, Statement};
 
 use super::expressions::parse_expression;
 use super::identifier::parse_identifier;
@@ -44,10 +43,10 @@ named!(parse_assignment<&str, Expression>,
 mod tests {
     use super::*;
     use nom::IResult::Done;
-    use c::expressions::UnaryOperator::*;
-    use c::expressions::BinaryOperator::*;
-    use c::Statement::*;
-    use c::Expression::*;
+    use c_ast::BinaryOperator::*;
+    use c_ast::Expression::*;
+    use c_ast::Statement::*;
+    use c_ast::UnaryOperator::*;
 
     #[test]
     fn test_parse_return() {

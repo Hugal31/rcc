@@ -6,7 +6,7 @@ mod logical_or_expr;
 mod relational_expr;
 mod term;
 
-use c::expressions::{BinaryOperator, Expression};
+use c_ast::{BinaryOperator, Expression};
 use super::identifier::parse_identifier;
 use self::logical_or_expr::parse_logical_or_expression;
 
@@ -34,8 +34,8 @@ pub fn fold_binary_expression(operations: (Expression, Vec<(BinaryOperator, Expr
 #[cfg(test)]
 mod tests {
     use nom::IResult::*;
-    use c::Expression::*;
-    use c::expressions::BinaryOperator::*;
+    use c_ast::BinaryOperator::*;
+    use c_ast::Expression::*;
     use super::*;
 
     #[test]
