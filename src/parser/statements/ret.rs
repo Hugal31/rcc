@@ -14,15 +14,24 @@ named!(pub parse_return<&str, Statement>,
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nom::IResult::Done;
-    use c_ast::Statement;
     use c_ast::Expression;
+    use c_ast::Statement;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_return() {
-        assert_eq!(parse_return("return 42"), Done("", Statement::Return(Expression::Constant(42))));
-        assert_eq!(parse_return("return\t42"), Done("", Statement::Return(Expression::Constant(42))));
-        assert_eq!(parse_return("return\n42"), Done("", Statement::Return(Expression::Constant(42))));
+        assert_eq!(
+            parse_return("return 42"),
+            Done("", Statement::Return(Expression::Constant(42)))
+        );
+        assert_eq!(
+            parse_return("return\t42"),
+            Done("", Statement::Return(Expression::Constant(42)))
+        );
+        assert_eq!(
+            parse_return("return\n42"),
+            Done("", Statement::Return(Expression::Constant(42)))
+        );
     }
 
     #[test]

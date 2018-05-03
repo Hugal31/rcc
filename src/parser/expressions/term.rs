@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use c_ast::{Expression, BinaryOperator};
-use super::fold_binary_expression;
 use super::factor::parse_factor;
+use super::fold_binary_expression;
+use c_ast::{BinaryOperator, Expression};
 
 named!(pub parse_term<&str, Expression>,
     map!(do_parse!(
@@ -22,10 +22,10 @@ named!(parse_term_operation<&str, (BinaryOperator, Expression)>,
 
 #[cfg(test)]
 mod tests {
-    use nom::IResult::Done;
+    use super::*;
     use c_ast::BinaryOperator;
     use c_ast::Expression::*;
-    use super::*;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_factor() {
@@ -37,9 +37,17 @@ mod tests {
     fn test_parse_multiplication() {
         let term = parse_term("42*23");
         let term_with_space = parse_term("42 * 23");
-        assert_eq!(term, Done("", BinOp(BinaryOperator::Multiplication,
-                                        Box::new(Constant(42)),
-                                        Box::new(Constant(23)))));
+        assert_eq!(
+            term,
+            Done(
+                "",
+                BinOp(
+                    BinaryOperator::Multiplication,
+                    Box::new(Constant(42)),
+                    Box::new(Constant(23))
+                )
+            )
+        );
         assert_eq!(term, term_with_space);
     }
 }

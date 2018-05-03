@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use c_ast::{BinaryOperator, Expression};
 use super::fold_binary_expression;
 use super::term::parse_term;
+use c_ast::{BinaryOperator, Expression};
 
 named!(pub parse_additive_expression<&str, Expression>,
     map!(do_parse!(
@@ -22,10 +22,10 @@ named!(parse_additive_operator<&str, (BinaryOperator, Expression)>,
 
 #[cfg(test)]
 mod tests {
-    use nom::IResult::Done;
+    use super::*;
     use c_ast::BinaryOperator;
     use c_ast::Expression::*;
-    use super::*;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_factor() {
@@ -37,17 +37,33 @@ mod tests {
     fn test_parse_addition() {
         let expression = parse_additive_expression("42+23");
         let expression_with_space = parse_additive_expression("42 + 23");
-        assert_eq!(expression, Done("", BinOp(BinaryOperator::Addition,
-                                              Box::new(Constant(42)),
-                                              Box::new(Constant(23)))));
+        assert_eq!(
+            expression,
+            Done(
+                "",
+                BinOp(
+                    BinaryOperator::Addition,
+                    Box::new(Constant(42)),
+                    Box::new(Constant(23))
+                )
+            )
+        );
         assert_eq!(expression, expression_with_space);
     }
 
     #[test]
     fn test_parse_subtraction() {
         let expression = parse_additive_expression("42-23");
-        assert_eq!(expression, Done("", BinOp(BinaryOperator::Subtraction,
-                                              Box::new(Constant(42)),
-                                              Box::new(Constant(23)))));
+        assert_eq!(
+            expression,
+            Done(
+                "",
+                BinOp(
+                    BinaryOperator::Subtraction,
+                    Box::new(Constant(42)),
+                    Box::new(Constant(23))
+                )
+            )
+        );
     }
 }

@@ -9,10 +9,9 @@ pub fn parse_identifier(input: &str) -> IResult<&str, &str> {
     }
 
     for (idx, item) in input.char_indices() {
-        if !(item == '_' || item.is_alphabetic()
-            || idx != 0 && item.is_digit(10)) {
+        if !(item == '_' || item.is_alphabetic() || idx != 0 && item.is_digit(10)) {
             if idx == 0 {
-                return Error(error_position!(ErrorKind::Custom(0), input))
+                return Error(error_position!(ErrorKind::Custom(0), input));
             } else {
                 return err_if_keyword(&input[idx..], &input[0..idx]);
             }
@@ -50,7 +49,7 @@ fn is_alphanumeric_or_underscore(ch: char) -> bool {
 mod tests {
     use super::*;
 
-    # [test]
+    #[test]
     fn test_parse_identifier() {
         assert_eq!(parse_identifier("abcdef1234"), Done("", "abcdef1234"));
         assert_eq!(parse_identifier("_abcdef1234"), Done("", "_abcdef1234"));

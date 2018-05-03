@@ -1,8 +1,8 @@
 use std::str::FromStr;
 
-use c_ast::{BinaryOperator, Expression};
-use super::fold_binary_expression;
 use super::additive_expr::parse_additive_expression;
+use super::fold_binary_expression;
+use c_ast::{BinaryOperator, Expression};
 
 named!(pub parse_relational_expression<&str, Expression>,
     map!(do_parse!(
@@ -24,10 +24,10 @@ named!(parse_relational_operation<&str, (BinaryOperator, Expression)>,
 
 #[cfg(test)]
 mod tests {
-    use nom::IResult::Done;
+    use super::*;
     use c_ast::BinaryOperator;
     use c_ast::Expression::*;
-    use super::*;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_factor() {
@@ -38,8 +38,16 @@ mod tests {
     #[test]
     fn test_less_or_equal() {
         let expression = parse_relational_expression("21 <= 42");
-        assert_eq!(expression, Done("", BinOp(BinaryOperator::LessOrEqual,
-        Box::new(Constant(21)),
-        Box::new(Constant(42)))));
+        assert_eq!(
+            expression,
+            Done(
+                "",
+                BinOp(
+                    BinaryOperator::LessOrEqual,
+                    Box::new(Constant(21)),
+                    Box::new(Constant(42))
+                )
+            )
+        );
     }
 }

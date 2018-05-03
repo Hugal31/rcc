@@ -2,10 +2,10 @@ mod ret;
 
 use c_ast::{Expression, Statement};
 
+use self::ret::parse_return;
 use super::expressions::parse_expression;
 use super::identifier::parse_identifier;
 use super::types::parse_type;
-use self::ret::parse_return;
 
 named!(pub parse_statement<&str, Statement>,
     ws!(do_parse!(
@@ -41,8 +41,9 @@ named!(parse_assignment<&str, Expression>,
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use nom::IResult::Done;
+
+    use super::*;
     use c_ast::BinaryOperator::*;
     use c_ast::Expression::*;
     use c_ast::Statement::*;
@@ -50,22 +51,41 @@ mod tests {
 
     #[test]
     fn test_parse_return() {
-        assert_eq!(parse_statement("return 42;"), Done("", Return(Constant(42))));
-        assert_eq!(parse_statement("return -42;"),
-                   Done("", Return(UnOp(Negation, Box::from(Constant(42))))));
+        assert_eq!(
+            parse_statement("return 42;"),
+            Done("", Return(Constant(42)))
+        );
+        assert_eq!(
+            parse_statement("return -42;"),
+            Done("", Return(UnOp(Negation, Box::from(Constant(42)))))
+        );
     }
 
     #[test]
     fn test_parse_expression() {
-        assert_eq!(parse_statement("42 + 3;"), Done("", Exp(BinOp(Addition,
-                                                                  Box::new(Constant(42)),
-                                                                  Box::new(Constant(3))))));
+        assert_eq!(
+            parse_statement("42 + 3;"),
+            Done(
+                "",
+                Exp(BinOp(
+                    Addition,
+                    Box::new(Constant(42)),
+                    Box::new(Constant(3))
+                ))
+            )
+        );
     }
 
     #[test]
     fn test_parse_declaration() {
         assert!(parse_statement("int;").is_err());
-        assert_eq!(parse_statement("int a;"), Done("", Declare("a".to_owned(), None)));
-        assert_eq!(parse_statement("int b = 4;"), Done("", Declare("b".to_owned(), Some(Constant(4)))));
+        assert_eq!(
+            parse_statement("int a;"),
+            Done("", Declare("a".to_owned(), None))
+        );
+        assert_eq!(
+            parse_statement("int b = 4;"),
+            Done("", Declare("b".to_owned(), Some(Constant(4))))
+        );
     }
 }

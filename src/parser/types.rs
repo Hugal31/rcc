@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
-use c_ast::Type;
 use super::identifier::continue_ident;
+use c_ast::Type;
 
 named!(pub parse_type<&str, Type>,
     do_parse!(

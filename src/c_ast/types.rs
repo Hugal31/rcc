@@ -1,9 +1,7 @@
-use std::fmt;
-use std::str::FromStr;
+use std::{fmt, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ParseTypeError {
-}
+pub struct ParseTypeError {}
 
 impl fmt::Display for ParseTypeError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
@@ -11,7 +9,7 @@ impl fmt::Display for ParseTypeError {
     }
 }
 
-#[derive(Debug,PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Type {
     Void,
     Int,
@@ -24,7 +22,7 @@ impl FromStr for Type {
         match s {
             "void" => Ok(Type::Void),
             "int" => Ok(Type::Int),
-            _ => Err(ParseTypeError{})
+            _ => Err(ParseTypeError {}),
         }
     }
 }
@@ -37,6 +35,6 @@ mod tests {
     fn test_from_str() {
         assert_eq!("void".parse(), Ok(Type::Void));
         assert_eq!("int".parse(), Ok(Type::Int));
-        assert_eq!("nop".parse::<Type>(), Err(ParseTypeError{}));
+        assert_eq!("nop".parse::<Type>(), Err(ParseTypeError {}));
     }
 }

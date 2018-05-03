@@ -3,10 +3,8 @@ mod identifier;
 mod statements;
 mod types;
 
+use self::{identifier::parse_identifier, statements::parse_statement, types::parse_type};
 use c_ast::Function;
-use self::identifier::parse_identifier;
-use self::statements::parse_statement;
-use self::types::parse_type;
 
 named!(parse_function<&str, Function>,
     ws!(
@@ -31,20 +29,23 @@ pub fn parse(input: &str) -> Result<Function, ::nom::Err<&str>> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use nom::IResult::Done;
     use c_ast::{Expression, Statement};
+    use nom::IResult::Done;
 
     #[test]
     fn parse_simple_function() {
-
         let function = "int main() {
     return 42;\
 }";
-        assert_eq!(parse_function(function),
-                   Done("",
-                        Function {
-                            name: "main".to_owned(),
-                            statements: vec![Statement::Return(Expression::Constant(42))]
-                        }));
+        assert_eq!(
+            parse_function(function),
+            Done(
+                "",
+                Function {
+                    name: "main".to_owned(),
+                    statements: vec![Statement::Return(Expression::Constant(42))],
+                }
+            )
+        );
     }
 }

@@ -5,7 +5,7 @@ pub struct Variable {
 
 impl Variable {
     pub fn new(name: &str) -> Variable {
-        Variable{
+        Variable {
             name: name.to_owned(),
         }
     }
@@ -16,7 +16,7 @@ impl Variable {
     }
 }
 
-#[derive(Debug,Default)]
+#[derive(Debug, Default)]
 pub struct Scope<'a> {
     parent: Option<&'a Scope<'a>>,
     variables: Vec<Variable>,
@@ -27,23 +27,20 @@ impl<'a> Scope<'a> {
         Scope::default()
     }
 
+    #[allow(dead_code)]
     pub fn new_child(&'a self) -> Scope<'a> {
-        Scope{
+        Scope {
             parent: Some(self),
             variables: Vec::new(),
         }
     }
 
     pub fn get_size(&self) -> usize {
-        self.get_parent_size() +
-            self.variables.iter()
-                .map(|v| v.get_size())
-                .sum::<usize>()
+        self.get_parent_size() + self.variables.iter().map(|v| v.get_size()).sum::<usize>()
     }
 
     fn get_parent_size(&self) -> usize {
-        self.parent.map(|s| s.get_size())
-            .unwrap_or(0)
+        self.parent.map(|s| s.get_size()).unwrap_or(0)
     }
 
     pub fn add_variable(&mut self, variable: Variable) {
@@ -51,12 +48,15 @@ impl<'a> Scope<'a> {
     }
 
     pub fn contains(&self, name: &str) -> bool {
-        self.parent.map(|s| s.contains(name)).unwrap_or(false) ||
-            self.variables.iter().any(|v| v.name == name)
+        self.parent.map(|s| s.contains(name)).unwrap_or(false)
+            || self.variables.iter().any(|v| v.name == name)
     }
 
+    #[allow(dead_code)]
     pub fn get_variable(&self, name: &str) -> Option<&Variable> {
-        self.variables.iter().find(|v| v.name == name)
+        self.variables
+            .iter()
+            .find(|v| v.name == name)
             .or_else(|| self.parent.map(|s| s.get_variable(name)).unwrap_or(None))
     }
 
@@ -64,12 +64,13 @@ impl<'a> Scope<'a> {
         let mut index = self.get_parent_size();
         for var in &self.variables {
             if var.name == name {
-                return Some(index)
+                return Some(index);
             }
             index += var.get_size();
         }
 
-        self.parent.map(|s| s.get_variable_index(name))
+        self.parent
+            .map(|s| s.get_variable_index(name))
             .unwrap_or(None)
     }
 }

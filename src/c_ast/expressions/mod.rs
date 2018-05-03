@@ -4,7 +4,7 @@ mod unary;
 pub use self::binary::*;
 pub use self::unary::*;
 
-#[derive(Clone,Debug,PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum Expression {
     Assign(String, Box<Expression>),
     Var(String),

@@ -1,14 +1,12 @@
-use std::result::Result as StdResult;
-use std::fmt;
-use std::str::FromStr;
+use std::{fmt, result::Result as StdResult, str::FromStr};
 
-#[derive(Clone,Copy,Debug,PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum BinaryOperator {
     Addition,
     Subtraction,
     Multiplication,
     Division,
-//    Modulo,
+    //    Modulo,
     LessThan,
     GreaterThan,
     LessOrEqual,
@@ -33,28 +31,28 @@ impl FromStr for BinaryOperator {
 
     fn from_str(s: &str) -> StdResult<Self, Self::Err> {
         match s {
-            "+"  => Ok(BinaryOperator::Addition),
-            "-"  => Ok(BinaryOperator::Subtraction),
-            "*"  => Ok(BinaryOperator::Multiplication),
-            "/"  => Ok(BinaryOperator::Division),
+            "+" => Ok(BinaryOperator::Addition),
+            "-" => Ok(BinaryOperator::Subtraction),
+            "*" => Ok(BinaryOperator::Multiplication),
+            "/" => Ok(BinaryOperator::Division),
             //"%"  => Ok(BinaryOperator::Modulo),
-            "<"  => Ok(BinaryOperator::LessThan),
-            ">"  => Ok(BinaryOperator::GreaterThan),
+            "<" => Ok(BinaryOperator::LessThan),
+            ">" => Ok(BinaryOperator::GreaterThan),
             "<=" => Ok(BinaryOperator::LessOrEqual),
             ">=" => Ok(BinaryOperator::GreaterOrEqual),
             "==" => Ok(BinaryOperator::Equal),
             "!=" => Ok(BinaryOperator::NotEqual),
             "&&" => Ok(BinaryOperator::LogicalAnd),
             "||" => Ok(BinaryOperator::LogicalOr),
-            _    => Err(ParseBinaryOperationError{}),
+            _ => Err(ParseBinaryOperationError {}),
         }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::BinaryOperator::*;
+    use super::*;
 
     #[test]
     fn test_parse() {
@@ -68,6 +66,9 @@ mod tests {
         assert_eq!(">=".parse(), Ok(GreaterOrEqual));
         assert_eq!("&&".parse(), Ok(LogicalAnd));
         assert_eq!("||".parse(), Ok(LogicalOr));
-        assert_eq!("nop".parse::<BinaryOperator>(), Err(ParseBinaryOperationError{}));
+        assert_eq!(
+            "nop".parse::<BinaryOperator>(),
+            Err(ParseBinaryOperationError {})
+        );
     }
 }

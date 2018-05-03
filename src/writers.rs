@@ -3,15 +3,19 @@ use std::io::{Result, Write};
 use memchr::memchr;
 
 pub struct IndentWriter<'a, W: 'a>
-    where W: Write {
+where
+    W: Write,
+{
     is_new_line: bool,
     inner: &'a mut W,
 }
 
 impl<'a, W> IndentWriter<'a, W>
-    where W: Write {
+where
+    W: Write,
+{
     pub fn new(inner: &'a mut W) -> IndentWriter<'a, W> {
-        IndentWriter{
+        IndentWriter {
             is_new_line: true,
             inner,
         }
@@ -19,10 +23,11 @@ impl<'a, W> IndentWriter<'a, W>
 }
 
 const TAB: &[u8; 1] = b"\t";
-    
-impl<'a, W> Write for IndentWriter<'a, W>
-    where W: Write {
 
+impl<'a, W> Write for IndentWriter<'a, W>
+where
+    W: Write,
+{
     fn write(&mut self, buf: &[u8]) -> Result<usize> {
         if self.is_new_line {
             if self.inner.write(TAB)? == 0 {
@@ -52,8 +57,12 @@ impl<'a, W> Write for IndentWriter<'a, W>
         while !buf.is_empty() {
             let was_new_line = self.is_new_line;
             match self.write(buf) {
-                Ok(0) if was_new_line == self.is_new_line => return Err(Error::new(ErrorKind::WriteZero,
-                                                                                   "failed to write whole buffer")),
+                Ok(0) if was_new_line == self.is_new_line => {
+                    return Err(Error::new(
+                        ErrorKind::WriteZero,
+                        "failed to write whole buffer",
+                    ))
+                }
                 Ok(n) => buf = &buf[n..],
                 Err(ref e) if e.kind() == ErrorKind::Interrupted => {}
                 Err(e) => return Err(e),
@@ -74,7 +83,7 @@ mod tests {
 
     impl SlowWriter {
         pub fn with_speed(speed: usize) -> SlowWriter {
-            SlowWriter{
+            SlowWriter {
                 speed,
                 inner: Vec::new(),
             }
@@ -97,7 +106,7 @@ mod tests {
 
     #[test]
     fn test_indent_single_line() {
-        let mut buf = vec!();
+        let mut buf = vec![];
         {
             let mut writer = IndentWriter::new(&mut buf);
 
@@ -108,7 +117,7 @@ mod tests {
 
     #[test]
     fn test_indent_multiple_lines() {
-        let mut buf = vec!();
+        let mut buf = vec![];
         {
             let mut writer = IndentWriter::new(&mut buf);
             writer.write_all(b"Line 1\n").unwrap();
@@ -119,7 +128,7 @@ mod tests {
 
     #[test]
     fn test_size_without_indent() {
-        let mut buf = vec!();
+        let mut buf = vec![];
         let mut writer = IndentWriter::new(&mut buf);
         let text = b"Line 1\n";
         let text_size = text.len();
@@ -129,7 +138,7 @@ mod tests {
 
     #[test]
     fn test_write_two_time() {
-        let mut buf = vec!();
+        let mut buf = vec![];
         {
             let mut writer = IndentWriter::new(&mut buf);
             writer.write_all(b"Line").unwrap();
@@ -160,7 +169,7 @@ mod tests {
 
     #[test]
     fn test_with_0_byte_slow_buffer() {
-        use std::io::{ErrorKind};
+        use std::io::ErrorKind;
 
         let mut slow_writer = SlowWriter::with_speed(0);
         let mut writer = IndentWriter::new(&mut slow_writer);

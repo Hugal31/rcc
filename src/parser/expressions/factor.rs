@@ -2,9 +2,9 @@ use std::str::FromStr;
 
 use nom::digit;
 
+use super::parse_expression;
 use c_ast::{Expression, UnaryOperator};
 use parser::identifier::parse_identifier;
-use super::parse_expression;
 
 named!(pub parse_factor<&str, Expression>,
     alt!(
@@ -48,10 +48,10 @@ named!(parse_variable<&str, Expression>,
 
 #[cfg(test)]
 mod tests {
-    use nom::IResult::Done;
-    use c_ast::Expression::*;
-    use c_ast::expressions::UnaryOperator;
     use super::*;
+    use c_ast::expressions::UnaryOperator;
+    use c_ast::Expression::*;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_simple_factor() {
@@ -60,22 +60,31 @@ mod tests {
 
     #[test]
     fn test_parse_unary_operator() {
-        assert_eq!(parse_factor("!42"),
-                   Done("",
-                        UnOp(UnaryOperator::LocalNegation,
-                             Box::new(Constant(42)))));
-        assert_eq!(parse_factor("!!42"),
-                   Done("",
-                        UnOp(UnaryOperator::LocalNegation,
-                             Box::new(UnOp(UnaryOperator::LocalNegation,Box::new(Constant(42)))))));
-        assert_eq!(parse_factor("~42"),
-                   Done("",
-                        UnOp(UnaryOperator::Bitwise,
-                             Box::new(Constant(42)))));
-        assert_eq!(parse_factor("-42"),
-                   Done("",
-                        UnOp(UnaryOperator::Negation,
-                             Box::new(Constant(42)))));
+        assert_eq!(
+            parse_factor("!42"),
+            Done(
+                "",
+                UnOp(UnaryOperator::LocalNegation, Box::new(Constant(42)))
+            )
+        );
+        assert_eq!(
+            parse_factor("!!42"),
+            Done(
+                "",
+                UnOp(
+                    UnaryOperator::LocalNegation,
+                    Box::new(UnOp(UnaryOperator::LocalNegation, Box::new(Constant(42))))
+                )
+            )
+        );
+        assert_eq!(
+            parse_factor("~42"),
+            Done("", UnOp(UnaryOperator::Bitwise, Box::new(Constant(42))))
+        );
+        assert_eq!(
+            parse_factor("-42"),
+            Done("", UnOp(UnaryOperator::Negation, Box::new(Constant(42))))
+        );
     }
 
     #[test]

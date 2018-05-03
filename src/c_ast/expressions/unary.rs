@@ -1,8 +1,8 @@
-use std::result::Result as StdResult;
 use std::fmt;
+use std::result::Result as StdResult;
 use std::str::FromStr;
 
-#[derive(Clone,Copy,Debug,PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum UnaryOperator {
     Negation,
     Bitwise,
@@ -26,7 +26,7 @@ impl FromStr for UnaryOperator {
             "~" => Ok(UnaryOperator::Bitwise),
             "!" => Ok(UnaryOperator::LocalNegation),
             "-" => Ok(UnaryOperator::Negation),
-            _ => Err(ParseUnaryOperatorError{}),
+            _ => Err(ParseUnaryOperatorError {}),
         }
     }
 }
@@ -40,6 +40,9 @@ mod tests {
         assert_eq!("~".parse(), Ok(UnaryOperator::Bitwise));
         assert_eq!("!".parse(), Ok(UnaryOperator::LocalNegation));
         assert_eq!("-".parse(), Ok(UnaryOperator::Negation));
-        assert_eq!("nop".parse::<UnaryOperator>(), Err(ParseUnaryOperatorError{}));
+        assert_eq!(
+            "nop".parse::<UnaryOperator>(),
+            Err(ParseUnaryOperatorError {})
+        );
     }
 }

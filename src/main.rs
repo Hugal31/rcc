@@ -1,26 +1,33 @@
-#[macro_use] extern crate clap;
+#[macro_use]
+extern crate clap;
 extern crate memchr;
 extern crate rcc;
 
-use clap::{Arg, App};
+use clap::{App, Arg};
 
 fn main() {
     let matches = App::new(env!("CARGO_PKG_NAME"))
         .author(env!("CARGO_PKG_AUTHORS"))
         .about(env!("CARGO_PKG_DESCRIPTION"))
         .version(crate_version!())
-        .arg(Arg::with_name("INPUT")
-             .help("Set the input file to use")
-             .required(true)
-             .index(1))
-        .arg(Arg::with_name("OUTPUT")
-             .long("output")
-             .short("o")
-             .help("Output file")
-             .takes_value(true))
-        .arg(Arg::with_name("ASSEMBLY")
-            .short("s")
-            .help("Output assembly"))
+        .arg(
+            Arg::with_name("INPUT")
+                .help("Set the input file to use")
+                .required(true)
+                .index(1),
+        )
+        .arg(
+            Arg::with_name("OUTPUT")
+                .long("output")
+                .short("o")
+                .help("Output file")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("ASSEMBLY")
+                .short("s")
+                .help("Output assembly"),
+        )
         .get_matches();
 
     let assembly = matches.is_present("ASSEMBLY");

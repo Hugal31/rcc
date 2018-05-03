@@ -1,6 +1,8 @@
 extern crate memchr;
-#[macro_use] extern crate error_chain;
-#[macro_use] extern crate nom;
+#[macro_use]
+extern crate error_chain;
+#[macro_use]
+extern crate nom;
 
 #[cfg(intellij_type_hinting)]
 extern crate error_chain_for_dumb_ides;
@@ -11,9 +13,9 @@ mod writers;
 pub mod c_ast;
 pub mod parser;
 
-use std::fs::File;
-use std::io::Read;
-use std::process::{Child, Command, Stdio};
+use std::{fs::File,
+          io::Read,
+          process::{Child, Command, Stdio}};
 
 use compile::{Compile, Scope};
 
@@ -47,14 +49,14 @@ pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) 
     let mut scope = Scope::new();
     if output_assembly {
         let mut output = File::create(output_file).map_err(|_| "Failed to create ouput file")?;
-        ast.compile(&mut output, &mut scope)
-            .map_err(|e| e.into())
+        ast.compile(&mut output, &mut scope).map_err(|e| e.into())
     } else {
         let mut child = get_cc_command(output_file);
-        ast.compile(child.stdin.as_mut().expect("Failed to open stdin"), &mut scope)?;
-        child.wait()
-            .map(|_| ())
-            .map_err(|e| e.into())
+        ast.compile(
+            child.stdin.as_mut().expect("Failed to open stdin"),
+            &mut scope,
+        )?;
+        child.wait().map(|_| ()).map_err(|e| e.into())
     }
 }
 
@@ -69,10 +71,12 @@ fn get_cc_command(output_file: &str) -> Child {
         .expect("Failed to execute command")
 }
 
-fn get_ast<I>(input: &mut I) -> Result<c_ast::Function> where I: Read {
+fn get_ast<I>(input: &mut I) -> Result<c_ast::Function>
+where
+    I: Read,
+{
     let mut data = String::new();
     input.read_to_string(&mut data).unwrap();
 
-    parser::parse(&data)
-        .map_err(|e| ErrorKind::SyntaxError(format!("{}", e)).into())
+    parser::parse(&data).map_err(|e| ErrorKind::SyntaxError(format!("{}", e)).into())
 }

@@ -1,6 +1,6 @@
-use c_ast::{BinaryOperator, Expression};
-use super::fold_binary_expression;
 use super::equality_expr::parse_equality_expression;
+use super::fold_binary_expression;
+use c_ast::{BinaryOperator, Expression};
 
 named!(pub parse_logical_and_expression<&str, Expression>,
     map!(do_parse!(
@@ -20,10 +20,10 @@ named!(parse_logical_and_operation<&str, (BinaryOperator, Expression)>,
 
 #[cfg(test)]
 mod tests {
-    use nom::IResult::Done;
+    use super::*;
     use c_ast::expressions::BinaryOperator;
     use c_ast::Expression::*;
-    use super::*;
+    use nom::IResult::Done;
 
     #[test]
     fn test_parse_factor() {
@@ -34,8 +34,16 @@ mod tests {
     #[test]
     fn test_logical_and() {
         let expression = parse_logical_and_expression("21 && 42");
-        assert_eq!(expression, Done("", BinOp(BinaryOperator::LogicalAnd,
-                                              Box::new(Constant(21)),
-                                              Box::new(Constant(42)))));
+        assert_eq!(
+            expression,
+            Done(
+                "",
+                BinOp(
+                    BinaryOperator::LogicalAnd,
+                    Box::new(Constant(21)),
+                    Box::new(Constant(42))
+                )
+            )
+        );
     }
 }
