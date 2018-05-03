@@ -2,19 +2,19 @@ use std::io::{Result, Write};
 
 use memchr::memchr;
 
-pub struct IndentWriter<'a, W: 'a>
+pub struct IndentWriter<W>
 where
     W: Write,
 {
     is_new_line: bool,
-    inner: &'a mut W,
+    inner: W,
 }
 
-impl<'a, W> IndentWriter<'a, W>
+impl<W> IndentWriter<W>
 where
     W: Write,
 {
-    pub fn new(inner: &'a mut W) -> IndentWriter<'a, W> {
+    pub fn new(inner: W) -> IndentWriter<W> {
         IndentWriter {
             is_new_line: true,
             inner,
@@ -24,7 +24,7 @@ where
 
 const TAB: &[u8; 1] = b"\t";
 
-impl<'a, W> Write for IndentWriter<'a, W>
+impl<W> Write for IndentWriter<W>
 where
     W: Write,
 {
@@ -128,8 +128,7 @@ mod tests {
 
     #[test]
     fn test_size_without_indent() {
-        let mut buf = vec![];
-        let mut writer = IndentWriter::new(&mut buf);
+        let mut writer = IndentWriter::new(Vec::new());
         let text = b"Line 1\n";
         let text_size = text.len();
         let size = writer.write(text).unwrap();
