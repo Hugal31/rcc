@@ -5,9 +5,6 @@ pub use self::x86::*;
 pub use self::{errors::*, scope::*};
 
 pub mod errors {
-    #[cfg(intellij_type_hinting)]
-    pub use error_chain_for_dumb_ides::stubs::*;
-
     error_chain! {
         errors {
             VariableAlreadyExists

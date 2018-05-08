@@ -72,11 +72,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "error-chain-for-dumb-ides"
-version = "0.1.0"
-source = "git+https://github.com/FauxFaux/error-chain-for-dumb-ides#1889aea1beea34dd9f86a12c774a1967bfa6823e"
-
-[[package]]
 name = "libc"
 version = "0.2.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -111,7 +106,6 @@ version = "0.1.0"
 dependencies = [
  "clap 2.30.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "error-chain 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "error-chain-for-dumb-ides 0.1.0 (git+https://github.com/FauxFaux/error-chain-for-dumb-ides)",
  "memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "nom 3.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -196,7 +190,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum cfg-if 0.1.2 (registry+https://github.com/rust-lang/crates.io-index)" = "d4c819a1287eb618df47cc647173c5c4c66ba19d888a6e50d605672aed3140de"
 "checksum clap 2.30.0 (registry+https://github.com/rust-lang/crates.io-index)" = "1c07b9257a00f3fc93b7f3c417fc15607ec7a56823bc2c37ec744e266387de5b"
 "checksum error-chain 0.11.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff511d5dc435d703f4971bc399647c9bc38e20cb41452e3b9feb4765419ed3f3"
-"checksum error-chain-for-dumb-ides 0.1.0 (git+https://github.com/FauxFaux/error-chain-for-dumb-ides)" = "<none>"
 "checksum libc 0.2.37 (registry+https://github.com/rust-lang/crates.io-index)" = "56aebce561378d99a0bb578f8cb15b6114d2a1814a6c7949bbe646d968bb4fa9"
 "checksum memchr 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "148fab2e51b4f1cfc66da2a7c32981d1d3c083a803978268bb11fe4b86925e7a"
 "checksum memchr 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)" = "796fba70e76612589ed2ce7f45282f5af869e0fdd7cc6199fa1aa1f1d591ba9d"
