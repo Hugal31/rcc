@@ -1,9 +1,11 @@
-mod compiler;
+mod context;
 mod scope;
-mod x86;
+
+pub mod x86;
 
 pub use self::x86::*;
-pub use self::{compiler::*, errors::*, scope::*};
+pub use self::context::*;
+pub use self::errors::*;
 
 pub mod errors {
     error_chain! {
@@ -20,22 +22,22 @@ pub mod errors {
 
 #[cfg(test)]
 mod tests {
-    use super::{Compile, Scope};
+    use super::{EmitAsm, Context};
 
     pub fn test_compile<C>(expr: C, expected_output: &str)
     where
-        C: Compile,
+        C: EmitAsm,
     {
-        let mut scope = Scope::new();
-        test_compile_with_scope(expr, &mut scope, expected_output)
+        let mut ctx = Context::new();
+        test_compile_with_context(expr, &mut ctx, expected_output)
     }
 
-    pub fn test_compile_with_scope<C>(expr: C, scope: &mut Scope, expected_output: &str)
+    pub fn test_compile_with_context<C>(expr: C, ctx: &mut Context, expected_output: &str)
     where
-        C: Compile,
+        C: EmitAsm,
     {
         let mut buffer = Vec::<u8>::with_capacity(256);
-        expr.compile(&mut buffer, scope).unwrap();
+        expr.emit_asm(&mut buffer, ctx).unwrap();
         assert_eq!(String::from_utf8(buffer).unwrap(), expected_output);
     }
 }

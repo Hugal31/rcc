@@ -2,13 +2,23 @@ mod expressions;
 mod function;
 mod statement;
 
-use compile::{errors::*, Compiler, Scope};
 use std::io;
 
-pub trait Compile {
-    fn compile<O>(&self, output: &mut O, scope: &mut Scope, compiler: &mut Compiler) -> Result<()>
+use c_ast::Function;
+use compile::{errors::*, Context};
+
+pub trait EmitAsm {
+    fn emit_asm<O>(&self, output: &mut O, ctx: &mut Context) -> Result<()>
     where
         O: io::Write;
+}
+
+pub fn emit_asm<O>(func: &Function, mut output: O) -> Result<()>
+    where
+    O: io::Write,
+{
+    let mut context = Context::new();
+    func.emit_asm(&mut output, &mut context)
 }
 
 pub fn write_epilogue<O>(output: &mut O) -> io::Result<()>

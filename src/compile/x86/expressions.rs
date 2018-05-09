@@ -3,32 +3,32 @@ use std::io::Write;
 use c_ast::expressions::*;
 use compile::*;
 
-impl Compile for Expression {
-    fn compile<O>(&self, output: &mut O, scope: &mut Scope, compiler: &mut Compiler) -> Result<()>
+impl EmitAsm for Expression {
+    fn emit_asm<O>(&self, output: &mut O, ctx: &mut Context) -> Result<()>
     where
         O: Write,
     {
         match *self {
             Expression::Assign(ref name, ref exp) => {
-                if !scope.contains(name) {
+                if !ctx.variable_is_defined(name) {
                     return Err(ErrorKind::UnknownVariable.into());
                 }
 
-                exp.compile(output, scope, compiler)?;
+                exp.emit_asm(output, ctx)?;
 
-                let index = scope.get_variable_index(name).unwrap();
-                let offset = scope.get_size() - index;
+                let index = ctx.get_variable_index(name).unwrap();
+                let offset = ctx.get_scope_size() - index;
                 output
                     .write_fmt(format_args!("movl %eax, -{}(%ebp)\n", offset))
                     .map_err(|e| e.into())
             }
             Expression::Var(ref name) => {
-                if !scope.contains(name) {
+                if !ctx.variable_is_defined(name) {
                     return Err(ErrorKind::UnknownVariable.into());
                 }
 
-                let index = scope.get_variable_index(name).unwrap();
-                let offset = scope.get_size() - index;
+                let index = ctx.get_variable_index(name).unwrap();
+                let offset = ctx.get_scope_size() - index;
                 output
                     .write_fmt(format_args!("movl -{}(%ebp), %eax\n", offset))
                     .map_err(|e| e.into())
@@ -37,22 +37,22 @@ impl Compile for Expression {
                 .write_fmt(format_args!("movl ${}, %eax\n", i))
                 .map_err(|e| e.into()),
             Expression::UnOp(ref op, ref expr) => {
-                expr.compile(output, scope, compiler)?;
-                op.compile(output, scope, compiler)
+                expr.emit_asm(output, ctx)?;
+                op.emit_asm(output, ctx)
             }
             Expression::BinOp(ref op, ref lval, ref rval) => {
-                lval.compile(output, scope, compiler)?;
+                lval.emit_asm(output, ctx)?;
                 output.write_all(b"push %eax\n")?;
-                rval.compile(output, scope, compiler)?;
+                rval.emit_asm(output, ctx)?;
                 output.write_all(b"pop %ecx\n")?;
-                op.compile(output, scope, compiler)
+                op.emit_asm(output, ctx)
             }
         }
     }
 }
 
-impl Compile for UnaryOperator {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope, _compiler: &mut Compiler) -> Result<()>
+impl EmitAsm for UnaryOperator {
+    fn emit_asm<O>(&self, output: &mut O, _ctx: &mut Context) -> Result<()>
     where
         O: Write,
     {
@@ -72,9 +72,9 @@ impl Compile for UnaryOperator {
     }
 }
 
-impl Compile for BinaryOperator {
+impl EmitAsm for BinaryOperator {
     // RValue should be in ECX, LValue in EAX
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope, _compiler: &mut Compiler) -> Result<()>
+    fn emit_asm<O>(&self, output: &mut O, _ctx: &mut Context) -> Result<()>
     where
         O: Write,
     {
@@ -152,21 +152,20 @@ mod tests {
 
     #[test]
     fn test_compile_variable() {
-        let variable = Variable::new("a");
-        let ast = Expression::Var(variable.name.clone());
-        let mut scope = Scope::new();
-        scope.add_variable(variable);
+        let ast = Expression::Var("a".to_owned());
+        let mut ctx = Context::new();
+        ctx.add_variable("a");
 
-        test_compile_with_scope(ast, &mut scope, "movl -4(%ebp), %eax\n");
+        test_compile_with_context(ast, &mut ctx, "movl -4(%ebp), %eax\n");
     }
 
     #[test]
     fn test_compile_unknown_variable() {
         let ast = Expression::Var("a".to_owned());
-        let mut scope = Scope::new();
+        let mut ctx = Context::new();
         let mut output = Vec::new();
 
-        match ast.compile(&mut output, &mut scope) {
+        match ast.emit_asm(&mut output, &mut ctx) {
             Err(Error(ErrorKind::UnknownVariable, _)) => (),
             _ => assert!(false, "Should return an error"),
         }
