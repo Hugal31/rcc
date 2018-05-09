@@ -3,7 +3,7 @@ mod identifier;
 mod statements;
 mod types;
 
-use self::{identifier::parse_identifier, statements::parse_statement, types::parse_type};
+use self::{identifier::parse_identifier, statements::parse_block_item, types::parse_type};
 use c_ast::Function;
 
 named!(parse_function<&str, Function>,
@@ -13,7 +13,7 @@ named!(parse_function<&str, Function>,
             name: parse_identifier >>
             char!('(') >> char!(')') >>
             char!('{') >>
-            statements: many0!(parse_statement) >>
+            statements: many0!(parse_block_item) >>
             char!('}') >>
             (Function{name: name.to_owned(), statements})
         )

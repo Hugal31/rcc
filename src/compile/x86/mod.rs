@@ -2,11 +2,11 @@ mod expressions;
 mod function;
 mod statement;
 
-use compile::{errors::*, Scope};
+use compile::{errors::*, Compiler, Scope};
 use std::io;
 
 pub trait Compile {
-    fn compile<O>(&self, output: &mut O, scope: &mut Scope) -> Result<()>
+    fn compile<O>(&self, output: &mut O, scope: &mut Scope, compiler: &mut Compiler) -> Result<()>
     where
         O: io::Write;
 }

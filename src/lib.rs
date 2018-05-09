@@ -17,7 +17,7 @@ use std::{fs::File,
           io::Read,
           process::{Child, Command, Stdio}};
 
-use compile::{Compile, Scope};
+use compile::{Compiler, Compile, Scope};
 
 pub use errors::*;
 
@@ -47,14 +47,17 @@ pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) 
     let ast = get_ast(&mut input)?;
 
     let mut scope = Scope::new();
+    let mut compiler = Compiler::new();
     if output_assembly {
         let mut output = File::create(output_file).map_err(|_| "Failed to create ouput file")?;
-        ast.compile(&mut output, &mut scope).map_err(|e| e.into())
+
+        ast.compile(&mut output, &mut scope, &mut compiler).map_err(|e| e.into())
     } else {
         let mut child = get_cc_command(output_file);
         ast.compile(
             child.stdin.as_mut().expect("Failed to open stdin"),
             &mut scope,
+            &mut compiler
         )?;
         child.wait().map(|_| ()).map_err(|e| e.into())
     }

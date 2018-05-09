@@ -8,7 +8,7 @@ use writers::IndentWriter;
 const RETURN_0: Statement = Statement::Return(Expression::Constant(0));
 
 impl Compile for Function {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()>
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope, compiler: &mut Compiler) -> Result<()>
     where
         O: io::Write,
     {
@@ -23,14 +23,14 @@ impl Compile for Function {
 movl %esp, %ebp\n",
         )?;
         for stmt in &self.statements {
-            stmt.compile(&mut indent_writer, &mut local_scope)?;
+            stmt.compile(&mut indent_writer, &mut local_scope, compiler)?;
         }
 
         match self.statements.last() {
             Some(&Statement::Return(_)) => (),
             _ => {
                 if self.name == "main" {
-                    RETURN_0.compile(&mut indent_writer, &mut local_scope)?;
+                    RETURN_0.compile(&mut indent_writer, &mut local_scope, compiler)?;
                 } else {
                     write_epilogue(&mut indent_writer)?;
                 }

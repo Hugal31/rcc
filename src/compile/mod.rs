@@ -1,8 +1,9 @@
+mod compiler;
 mod scope;
 mod x86;
 
 pub use self::x86::*;
-pub use self::{errors::*, scope::*};
+pub use self::{compiler::*, errors::*, scope::*};
 
 pub mod errors {
     error_chain! {

@@ -12,3 +12,5 @@ pub const KEYWORDS: &[&str] = &[
     // Other keywords
     "return",
 ];
+
+pub type AST = Function;

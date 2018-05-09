@@ -4,7 +4,7 @@ use c_ast::expressions::*;
 use compile::*;
 
 impl Compile for Expression {
-    fn compile<O>(&self, output: &mut O, scope: &mut Scope) -> Result<()>
+    fn compile<O>(&self, output: &mut O, scope: &mut Scope, compiler: &mut Compiler) -> Result<()>
     where
         O: Write,
     {
@@ -14,7 +14,7 @@ impl Compile for Expression {
                     return Err(ErrorKind::UnknownVariable.into());
                 }
 
-                exp.compile(output, scope)?;
+                exp.compile(output, scope, compiler)?;
 
                 let index = scope.get_variable_index(name).unwrap();
                 let offset = scope.get_size() - index;
@@ -37,22 +37,22 @@ impl Compile for Expression {
                 .write_fmt(format_args!("movl ${}, %eax\n", i))
                 .map_err(|e| e.into()),
             Expression::UnOp(ref op, ref expr) => {
-                expr.compile(output, scope)?;
-                op.compile(output, scope)
+                expr.compile(output, scope, compiler)?;
+                op.compile(output, scope, compiler)
             }
             Expression::BinOp(ref op, ref lval, ref rval) => {
-                lval.compile(output, scope)?;
+                lval.compile(output, scope, compiler)?;
                 output.write_all(b"push %eax\n")?;
-                rval.compile(output, scope)?;
+                rval.compile(output, scope, compiler)?;
                 output.write_all(b"pop %ecx\n")?;
-                op.compile(output, scope)
+                op.compile(output, scope, compiler)
             }
         }
     }
 }
 
 impl Compile for UnaryOperator {
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()>
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope, _compiler: &mut Compiler) -> Result<()>
     where
         O: Write,
     {
@@ -74,7 +74,7 @@ impl Compile for UnaryOperator {
 
 impl Compile for BinaryOperator {
     // RValue should be in ECX, LValue in EAX
-    fn compile<O>(&self, output: &mut O, _scope: &mut Scope) -> Result<()>
+    fn compile<O>(&self, output: &mut O, _scope: &mut Scope, _compiler: &mut Compiler) -> Result<()>
     where
         O: Write,
     {
