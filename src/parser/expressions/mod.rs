@@ -1,4 +1,5 @@
 mod additive_expr;
+mod conditional_expr;
 mod equality_expr;
 mod factor;
 mod logical_and_expr;
@@ -6,12 +7,12 @@ mod logical_or_expr;
 mod relational_expr;
 mod term;
 
-use self::logical_or_expr::parse_logical_or_expression;
+use self::conditional_expr::parse_conditional_expression;
 use super::identifier::parse_identifier;
 use c_ast::{BinaryOperator, Expression};
 
 named!(pub parse_expression<&str, Expression>,
-    alt!(parse_assignment | parse_logical_or_expression)
+    alt!(parse_assignment | parse_conditional_expression)
 );
 
 named!(parse_assignment<&str, Expression>,
@@ -63,8 +64,8 @@ mod tests {
     #[test]
     fn parse_assigment() {
         assert_eq!(
-            parse_expression("a = 4"),
-            Done("", Assign("a".to_owned(), Box::new(Constant(4))))
+            parse_expression("a = 4;"),
+            Done(";", Assign("a".to_owned(), Box::new(Constant(4))))
         );
     }
 }

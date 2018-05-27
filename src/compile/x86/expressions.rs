@@ -17,7 +17,7 @@ impl EmitAsm for Expression {
                 exp.emit_asm(output, ctx)?;
 
                 let index = ctx.get_variable_index(name).unwrap();
-                let offset = ctx.get_scope_size() - index;
+                let offset = index + 4;
                 output
                     .write_fmt(format_args!("movl %eax, -{}(%ebp)\n", offset))
                     .map_err(|e| e.into())
@@ -28,7 +28,7 @@ impl EmitAsm for Expression {
                 }
 
                 let index = ctx.get_variable_index(name).unwrap();
-                let offset = ctx.get_scope_size() - index;
+                let offset = index + 4;
                 output
                     .write_fmt(format_args!("movl -{}(%ebp), %eax\n", offset))
                     .map_err(|e| e.into())
@@ -47,6 +47,20 @@ impl EmitAsm for Expression {
                 output.write_all(b"pop %ecx\n")?;
                 op.emit_asm(output, ctx)
             }
+            Expression::Conditional {
+                ref condition,
+                ref then,
+                ref els,
+            } => {
+                let condition_idx = ctx.new_condition();
+                let result = condition.emit_asm(output, ctx)
+                    .and_then(|()| output.write_all(b"cmpl $0, %eax\n").map_err(|e| e.into()))
+                    .and_then(|()| write!(output, "je _cond_{}_else\n", condition_idx).map_err(|e| e.into()))
+                    .and_then(|()| then.emit_asm(output, ctx))
+                    .and_then(|()| write!(output, "jmp _cond_{}_end\n", condition_idx).map_err(|e| e.into()));
+                    result.and_then(|()| write!(output, "_cond_{}_else:\n", condition_idx).map_err(|e| e.into()))
+                        .and_then(|()| els.emit_asm(output, ctx))
+ .and_then(|()| write!(output, "_cond_{}_end:\n", condition_idx).map_err(|e| e.into()))},
         }
     }
 }

@@ -28,13 +28,12 @@ impl EmitAsm for Statement {
                     })
                     .and_then(|()| then.emit_asm(output, ctx))
                     .and_then(|()| write!(output, "jmp _cond_{}_end\n", condition_idx).map_err(|e| e.into()));
-                let result = if let Some(els) = els {
+                if let Some(els) = els {
                     result.and_then(|()| write!(output, "_cond_{}_else:\n", condition_idx).map_err(|e| e.into()))
                         .and_then(|()| els.emit_asm(output, ctx))
                 } else {
                     result
-                };
-                result.and_then(|()| write!(output, "_cond_{}_end:\n", condition_idx).map_err(|e| e.into()))
+                }.and_then(|()| write!(output, "_cond_{}_end:\n", condition_idx).map_err(|e| e.into()))
             },
             Statement::Return(ref e) => {
                 e.emit_asm(output, ctx)?;

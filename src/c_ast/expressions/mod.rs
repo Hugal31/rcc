@@ -11,4 +11,9 @@ pub enum Expression {
     Constant(i32),
     UnOp(UnaryOperator, Box<Expression>),
     BinOp(BinaryOperator, Box<Expression>, Box<Expression>),
+    Conditional {
+        condition: Box<Expression>,
+        then: Box<Expression>,
+        els: Box<Expression>,
+    },
 }
