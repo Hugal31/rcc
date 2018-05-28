@@ -40,7 +40,7 @@ impl<'a> Scope<'a> {
     }
 
     fn get_parent_size(&self) -> usize {
-        self.parent.map(|s| s.get_size()).unwrap_or(0)
+        self.parent.map(|s| s.get_size()).unwrap_or(4) // The top scope contains the save for rsp
     }
 
     pub fn add_variable(&mut self, variable: Variable) {

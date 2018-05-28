@@ -16,8 +16,7 @@ impl EmitAsm for Expression {
 
                 exp.emit_asm(output, ctx)?;
 
-                let index = ctx.get_variable_index(name).unwrap();
-                let offset = index + 4;
+                let offset = ctx.get_variable_index(name).unwrap();
                 output
                     .write_fmt(format_args!("movl %eax, -{}(%ebp)\n", offset))
                     .map_err(|e| e.into())
@@ -27,8 +26,7 @@ impl EmitAsm for Expression {
                     return Err(ErrorKind::UnknownVariable.into());
                 }
 
-                let index = ctx.get_variable_index(name).unwrap();
-                let offset = index + 4;
+                let offset = ctx.get_variable_index(name).unwrap();
                 output
                     .write_fmt(format_args!("movl -{}(%ebp), %eax\n", offset))
                     .map_err(|e| e.into())
