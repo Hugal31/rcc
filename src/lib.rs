@@ -4,9 +4,6 @@ extern crate error_chain;
 #[macro_use]
 extern crate nom;
 
-#[cfg(intellij_type_hinting)]
-extern crate error_chain_for_dumb_ides;
-
 mod compile;
 mod writers;
 
@@ -22,9 +19,6 @@ use compile::x86;
 pub use errors::*;
 
 pub mod errors {
-    #[cfg(intellij_type_hinting)]
-    pub use error_chain_for_dumb_ides::stubs::*;
-
     error_chain! {
         errors {
             SyntaxError(desc: String) {
