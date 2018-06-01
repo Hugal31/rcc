@@ -10,7 +10,8 @@ mod writers;
 pub mod c_ast;
 pub mod parser;
 
-use std::{fs::File,
+use std::{fs,
+          fs::File,
           io::Read,
           process::{Child, Command, Stdio}};
 
@@ -40,7 +41,7 @@ pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) 
 
     let ast = get_ast(&mut input)?;
 
-    if output_assembly {
+    let result = if output_assembly {
         let mut output = File::create(output_file).map_err(|_| "Failed to create ouput file")?;
 
         x86::emit_asm(&ast, &mut output).map_err(|e| e.into())
@@ -51,7 +52,13 @@ pub fn compile_file(input_file: &str, output_file: &str, output_assembly: bool) 
             child.stdin.as_mut().expect("Failed to open stdin"),
         )?;
         child.wait().map(|_| ()).map_err(|e| e.into())
+    };
+
+    if result.is_err() {
+        fs::remove_file(output_file).ok();
     }
+
+    result
 }
 
 fn get_cc_command(output_file: &str) -> Child {
